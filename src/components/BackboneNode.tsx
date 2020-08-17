@@ -9,7 +9,7 @@ import translate from '../Utils/translate';
 import { treeColor } from './Styles';
 import {
   symbol,
-  symbolSquare
+  symbolSquare, symbolTriangle, symbolWye
 } from "d3-shape";
 
 interface BackboneNodeProps<T, S extends string, A> {
@@ -38,6 +38,8 @@ interface BackboneNodeProps<T, S extends string, A> {
   expandedClusterList?: string[];
   cellsVisArea?: number;
 }
+
+
 
 function BackboneNode<T, S extends string, A>({
   prov,
@@ -327,15 +329,15 @@ function BackboneNode<T, S extends string, A>({
       // Why are the curly braces after => a problem?  oneliners work, curly braces not RW
       // @ts-ignore
       cellsVis = node.state.model.cells.map((cell, index) =>
-        <g transform={translate(20+((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+4)*index,10)}>
+        <g key={index} transform={translate(20+((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+6)*index,10)}>
           <path
             strokeWidth={2}
             className={treeColor(false)}
-            d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
+            // d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
+            d={createSymbolPath({cell})}
           />
         </g>);
     }
-
     // @ts-ignore
     if(node.state.model.cells != null){
       return <g>
@@ -345,6 +347,25 @@ function BackboneNode<T, S extends string, A>({
 
     return null;
   }
+
+  function createSymbolPath(cell: { cell?: any; cell_type?: any; }){
+    switch (cell.cell.cell_type) { // why cells.cells? At the call it is cell, but here it is cell.cell RW
+      case "code": {
+        return symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!;
+        break;
+      }
+      case "markdown": {
+        return symbol().type(symbolWye).size(cellsVisArea ? cellsVisArea : 15)()!;
+        break;
+      }
+      case "raw": {
+        return symbol().type(symbolTriangle).size(cellsVisArea ? cellsVisArea : 15)()!;
+        break;
+      }
+    }
+  }
+
+
 }
 
 export default BackboneNode;

@@ -92,7 +92,7 @@ function ProvVis<T, S extends string, A>({
   undoRedoButtons = true,
   prov,
   ephemeralUndo = false,
-  cellsVisArea = 30
+  cellsVisArea = 50
 }: ProvVisProps<T, S, A>) {
   const [first, setFirst] = useState(true);
   const [bookmark, setBookmark] = useState(false);
