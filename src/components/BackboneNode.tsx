@@ -7,6 +7,10 @@ import { BundleMap } from '../Utils/BundleMap';
 import { EventConfig } from '../Utils/EventConfig';
 import translate from '../Utils/translate';
 import { treeColor } from './Styles';
+import {
+  symbol,
+  symbolSquare
+} from "d3-shape";
 
 interface BackboneNodeProps<T, S extends string, A> {
   prov?: Provenance<T, S, A>;
@@ -32,6 +36,7 @@ interface BackboneNodeProps<T, S extends string, A> {
   popupContent?: (nodeId: StateNode<T, S, A>) => ReactChild;
   annotationContent?: (nodeId: StateNode<T, S, A>) => ReactChild;
   expandedClusterList?: string[];
+  cellsVisArea?: number;
 }
 
 function BackboneNode<T, S extends string, A>({
@@ -58,6 +63,7 @@ function BackboneNode<T, S extends string, A>({
   editAnnotations,
   annotationContent,
   expandedClusterList,
+  cellsVisArea,
 }: BackboneNodeProps<T, S, A>) {
   const padding = 15;
 
@@ -141,7 +147,6 @@ function BackboneNode<T, S extends string, A>({
   if (annotate.length > 20) annotate = annotate.substr(0, 20) + "..";
 
   if (label.length > 20) label = label.substr(0, 20) + "..";
-
 
   let labelG = (
     <g style={{ opacity: 1 }} transform={translate(padding, 0)}>
@@ -275,6 +280,11 @@ function BackboneNode<T, S extends string, A>({
           ) : (
             labelG
           )}
+
+          {
+            <CellsVis></CellsVis>
+          }
+          {/* {cellsVis} */}
         </>
       )}
     </Animate>
@@ -308,6 +318,33 @@ function BackboneNode<T, S extends string, A>({
 
     event.stopPropagation();
   }
+
+  function CellsVis(){
+    let cellsVis;
+
+    // @ts-ignore
+    if(node.state.model.cells != null){
+      // Why are the curly braces after => a problem?  oneliners work, curly braces not RW
+      // @ts-ignore
+      cellsVis = node.state.model.cells.map((cell, index) =>
+        <g transform={translate(20+((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+4)*index,10)}>
+          <path
+            strokeWidth={2}
+            className={treeColor(false)}
+            d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
+          />
+        </g>);
+    }
+
+    // @ts-ignore
+    if(node.state.model.cells != null){
+      return <g>
+        {cellsVis}
+      </g>;
+    }
+
+    return null;
+  }
 }
 
 export default BackboneNode;
@@ -317,3 +354,5 @@ export default BackboneNode;
 // }) => {
 //   return <text {...props}>{props.label}</text>;
 // };
+
+

@@ -52,6 +52,7 @@ interface ProvVisProps<T, S extends string, A> {
   editAnnotations?: boolean
   prov?: Provenance<T, S, A>;
   ephemeralUndo?: boolean;
+  cellsVisArea?: number;
 }
 
 export type StratifiedMap<T, S, A> = {
@@ -90,7 +91,8 @@ function ProvVis<T, S extends string, A>({
   editAnnotations = false,
   undoRedoButtons = true,
   prov,
-  ephemeralUndo = false
+  ephemeralUndo = false,
+  cellsVisArea = 30
 }: ProvVisProps<T, S, A>) {
   const [first, setFirst] = useState(true);
   const [bookmark, setBookmark] = useState(false);
@@ -326,6 +328,7 @@ function ProvVis<T, S extends string, A>({
 
   const stratifiedTree = strat(nodeList);
 
+
   // //console.log(JSON.parse(JSON.stringify(stratifiedTree)));
 
   const stratifiedList: StratifiedList<T, S, A> = stratifiedTree.descendants();
@@ -391,13 +394,23 @@ function ProvVis<T, S extends string, A>({
 
   let shiftLeft = 0;
 
+
+
+  // if (maxWidth === 0) {
+  //   shiftLeft = 30;
+  // } else if (maxWidth === 1) {
+  //   shiftLeft = 52;
+  // }
+  // else if (maxWidth > 1) {
+  //   shiftLeft = 74;
+  // }
   if (maxWidth === 0) {
     shiftLeft = 30;
-  } else if (maxWidth === 1) {
-    shiftLeft = 52;
-  } else if (maxWidth > 1) {
-    shiftLeft = 74;
+  } else {
+    shiftLeft = 30 + maxWidth * 22;
   }
+
+
 
   let svgWidth = width;
 
@@ -563,6 +576,7 @@ function ProvVis<T, S extends string, A>({
                             annotationContent={annotationContent}
                             popupContent={popupContent}
                             expandedClusterList={expandedClusterList}
+                            cellsVisArea={cellsVisArea}
                           />
                         ) : popupContent !== undefined ? (
                           <Popup
