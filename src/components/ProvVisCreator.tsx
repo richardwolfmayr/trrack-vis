@@ -8,25 +8,26 @@ import {BundleMap} from '../Utils/BundleMap';
 import { Provenance, ProvenanceGraph, NodeID } from '@visdesignlab/trrack';
 
 export interface ProvVisConfig {
-  eventConfig: EventConfig<any>;
-  editAnnotations: boolean;
-  bundleMap: BundleMap;
-  iconOnly: boolean;
-  iconSize: number;
-  height: number;
-  width: number;
-  sideOffset: number;
-  backboneGutter: number;
-  gutter: number;
-  verticalSpace: number;
-  regularCircleRadius: number;
-  backboneCircleRadius: number;
-  regularCircleStroke: number;
-  backboneCircleStroke: number;
-  topOffset: number;
-  textSize: number;
-  linkWidth: number;
-  duration: number;
+  eventConfig?: EventConfig<any>;
+  editAnnotations?: boolean;
+  bundleMap?: BundleMap;
+  iconOnly?: boolean;
+  iconSize?: number;
+  height?: number;
+  width?: number;
+  sideOffset?: number;
+  backboneGutter?: number;
+  gutter?: number;
+  verticalSpace?: number;
+  regularCircleRadius?: number;
+  backboneCircleRadius?: number;
+  regularCircleStroke?: number;
+  backboneCircleStroke?: number;
+  topOffset?: number;
+  textSize?: number;
+  linkWidth?: number;
+  duration?: number;
+  cellsVisArea?: number;
 }
 
 export function ProvVisCreator<T, S extends string, A>(

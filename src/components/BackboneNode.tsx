@@ -11,6 +11,7 @@ import {
   symbol,
   symbolSquare, symbolTriangle, symbolWye
 } from "d3-shape";
+import {style} from "typestyle";
 
 interface BackboneNodeProps<T, S extends string, A> {
   prov?: Provenance<T, S, A>;
@@ -150,6 +151,12 @@ function BackboneNode<T, S extends string, A>({
 
   if (label.length > 20) label = label.substr(0, 20) + "..";
 
+  // text should always be on the right side of the cellsVis
+  // @ts-ignore
+  if(node.state.model.cells != null){
+    // @ts-ignore
+    padding += ((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+6)*node.state.model.cells.length;
+  }
   let labelG = (
     <g style={{ opacity: 1 }} transform={translate(padding, 0)}>
       {!iconOnly ? (
@@ -326,15 +333,15 @@ function BackboneNode<T, S extends string, A>({
 
     // @ts-ignore
     if(node.state.model.cells != null){
-      // Why are the curly braces after => a problem?  oneliners work, curly braces not RW
       // @ts-ignore
       cellsVis = node.state.model.cells.map((cell, index) =>
-        <g key={index} transform={translate(20+((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+6)*index,10)}>
+        <g key={index} transform={translate(20+((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+6)*index,0)}>
           <path
             strokeWidth={2}
-            className={treeColor(false)}
-            // d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
-            d={createSymbolPath({cell})}
+            // className={treeColor(false)}
+            className={symbolColor(cell,index)}
+            d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
+            // d={createSymbolPath(cell)}
           />
         </g>);
     }
@@ -348,22 +355,52 @@ function BackboneNode<T, S extends string, A>({
     return null;
   }
 
-  function createSymbolPath(cell: { cell?: any; cell_type?: any; }){
-    switch (cell.cell.cell_type) { // why cells.cells? At the call it is cell, but here it is cell.cell RW
-      case "code": {
-        return symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!;
-        break;
-      }
-      case "markdown": {
-        return symbol().type(symbolWye).size(cellsVisArea ? cellsVisArea : 15)()!;
-        break;
-      }
-      case "raw": {
-        return symbol().type(symbolTriangle).size(cellsVisArea ? cellsVisArea : 15)()!;
-        break;
+  function symbolColor(cell: { cell_type?: any; }, index: number){
+      switch (cell.cell_type) {
+        case "code": {
+          return style({
+            // @ts-ignore
+            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(88, 22, 22)' : 'white',
+            stroke: 'rgb(88, 22, 22)'
+          });
+          break;
+        }
+        case "markdown": {
+          return style({
+            // @ts-ignore
+            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 88, 22)' : 'white',
+            stroke: 'rgb(22, 88, 22)'
+          });
+          break;
+        }
+        case "raw": {
+          return style({
+            // @ts-ignore
+            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 22, 88)' : 'white',
+            stroke: 'rgb(22, 22, 88)'
+          });
+          break;
+        }
       }
     }
-  }
+
+  // not needed if I encode the different cell types in color
+  // function createSymbolPath(cell: { cell?: any; cell_type?: any; }){
+  //   switch (cell.cell_type) { // why cells.cells? At the call it is cell, but here it is cell.cell RW
+  //     case "code": {
+  //       return symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!;
+  //       break;
+  //     }
+  //     case "markdown": {
+  //       return symbol().type(symbolWye).size(cellsVisArea ? cellsVisArea : 15)()!;
+  //       break;
+  //     }
+  //     case "raw": {
+  //       return symbol().type(symbolTriangle).size(cellsVisArea ? cellsVisArea : 15)()!;
+  //       break;
+  //     }
+  //   }
+  // }
 
 
 }
