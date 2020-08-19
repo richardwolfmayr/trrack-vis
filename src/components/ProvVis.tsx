@@ -328,9 +328,6 @@ function ProvVis<T, S extends string, A>({
 
   const stratifiedTree = strat(nodeList);
 
-
-  // //console.log(JSON.parse(JSON.stringify(stratifiedTree)));
-
   const stratifiedList: StratifiedList<T, S, A> = stratifiedTree.descendants();
   const stratifiedMap: StratifiedMap<T, S, A> = {};
 
@@ -435,6 +432,14 @@ function ProvVis<T, S extends string, A>({
     overflowY: "auto",
   } as React.CSSProperties;
 
+
+  console.log(links);
+  console.log(stratifiedList[1].data.getState())
+  // @ts-ignore
+  console.log(prov.getExtraFromArtifact(stratifiedList[1].id)[0].e.changedCellId);
+  // @ts-ignore
+  console.log(prov.getExtraFromArtifact(stratifiedList[2].id)[0].e.relations);
+
   return (
     <div style={overflowStyle} className={container} id="prov-vis">
       <div id="undoRedoDiv">
@@ -500,7 +505,7 @@ function ProvVis<T, S extends string, A>({
               <>
                 {linkArr.map((link) => {
                   const { key, state } = link;
-
+                  // console.log(linkArr);
                   return (
                     <g key={key}>
                       <Link
@@ -577,6 +582,7 @@ function ProvVis<T, S extends string, A>({
                             popupContent={popupContent}
                             expandedClusterList={expandedClusterList}
                             cellsVisArea={cellsVisArea}
+                            yOffset={yOffset}
                           />
                         ) : popupContent !== undefined ? (
                           <Popup

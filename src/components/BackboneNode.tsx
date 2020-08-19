@@ -38,6 +38,7 @@ interface BackboneNodeProps<T, S extends string, A> {
   annotationContent?: (nodeId: StateNode<T, S, A>) => ReactChild;
   expandedClusterList?: string[];
   cellsVisArea?: number;
+  yOffset: number;
 }
 
 
@@ -67,6 +68,7 @@ function BackboneNode<T, S extends string, A>({
   annotationContent,
   expandedClusterList,
   cellsVisArea,
+  yOffset = 10,
 }: BackboneNodeProps<T, S, A>) {
   const padding = 15;
 
@@ -291,7 +293,7 @@ function BackboneNode<T, S extends string, A>({
           )}
 
           {
-            <CellsVis></CellsVis>
+            <CellsVis/>
           }
           {/* {cellsVis} */}
         </>
@@ -328,31 +330,85 @@ function BackboneNode<T, S extends string, A>({
     event.stopPropagation();
   }
 
-  function CellsVis(){
+  function CellsVis() {
     let cellsVis;
-
+    let squareSideLength = cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15);
+    let xLength = (squareSideLength + 6);
     // @ts-ignore
-    if(node.state.model.cells != null){
+    if (node.state.model.cells != null) {
       // @ts-ignore
       cellsVis = node.state.model.cells.map((cell, index) =>
-        <g key={index} transform={translate(20+((cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15) )+6)*index,0)}>
+        <g key={index}
+           transform={translate(20 + xLength * index, 0)}>
           <path
             strokeWidth={2}
-            // className={treeColor(false)}
-            className={symbolColor(cell,index)}
+            className={symbolColor(cell, index)}
             d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
-            // d={createSymbolPath(cell)}
           />
+          <CellsLine yLength={squareSideLength/2} xLength={xLength} cell={cell} index={index}/>
         </g>);
     }
     // @ts-ignore
-    if(node.state.model.cells != null){
+
+    if (node.state.model.cells != null) {
       return <g>
         {cellsVis}
       </g>;
     }
 
     return null;
+  }
+
+
+  interface CellsLineProps {
+    yLength: number,
+    xLength: number,
+    cell:{cell_type: string},
+    index: number
+  }
+
+  function CellsLine({
+    yLength,
+    xLength,
+    cell,
+    index
+  }: CellsLineProps){
+    let previousPosition = index;
+    // @ts-ignore
+    let relations = prov.getExtraFromArtifact(node.id)[0].e.relations;
+    debugger
+    if(relations != null){ // cell added or moved
+      if(relations[index] != null){ // some cell moved
+        if(relations[index] == index){ // this cell didnt change position
+          return <line
+            x1="0"
+            y1={-yLength}
+            x2="0"
+            y2={-yOffset+yLength}
+            strokeWidth={2}
+            stroke="rgb(0,0,0)"/>
+        }else{ // this changed position
+          return <line
+            x1={(relations[index]-index) * xLength}
+            y1={-yLength}
+            x2="0"
+            y2={-yOffset+yLength}
+            strokeWidth={2}
+            stroke="rgb(0,0,0)"/>
+        }
+      } else{ // cell newly added ==> no line to empty space above
+        return null;
+      }
+    }
+
+    // If no relations info exists, then no cell has been added and no cell has been moved ==> just draw a line straight up
+    return <line
+      x1="0"
+      y1={-yLength}
+      x2="0"
+      y2={-yOffset+yLength}
+      strokeWidth={2}
+      stroke="rgb(0,0,0)"/>
   }
 
   function symbolColor(cell: { cell_type?: any; }, index: number){
