@@ -52,7 +52,6 @@ export function ProvVisCreator<T, S extends string, A>(
     />,
     node
   );
-  // debugger
 }
 
 export function UndoRedoButtonCreator<T, S extends string, A>(

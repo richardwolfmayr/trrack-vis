@@ -434,11 +434,6 @@ function ProvVis<T, S extends string, A>({
 
 
   console.log(links);
-  console.log(stratifiedList[1].data.getState())
-  // @ts-ignore
-  console.log(prov.getExtraFromArtifact(stratifiedList[1].id)[0].e.changedCellId);
-  // @ts-ignore
-  console.log(prov.getExtraFromArtifact(stratifiedList[2].id)[0].e.relations);
 
   return (
     <div style={overflowStyle} className={container} id="prov-vis">

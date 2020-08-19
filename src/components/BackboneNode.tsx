@@ -376,28 +376,30 @@ function BackboneNode<T, S extends string, A>({
     let previousPosition = index;
     // @ts-ignore
     let relations = prov.getExtraFromArtifact(node.id)[0].e.relations;
-    debugger
     if(relations != null){ // cell added or moved
-      if(relations[index] != null){ // some cell moved
-        if(relations[index] == index){ // this cell didnt change position
-          return <line
-            x1="0"
-            y1={-yLength}
-            x2="0"
-            y2={-yOffset+yLength}
-            strokeWidth={2}
-            stroke="rgb(0,0,0)"/>
-        }else{ // this changed position
-          return <line
-            x1={(relations[index]-index) * xLength}
-            y1={-yLength}
-            x2="0"
-            y2={-yOffset+yLength}
-            strokeWidth={2}
-            stroke="rgb(0,0,0)"/>
+      // @ts-ignore
+      if(relations.length != node.state.model.cells.length) { // some cell was added
+        // @ts-ignore
+        if (relations[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || relations[index] == undefined) { // this is the new cell, undefined if on rightmost side
+          return null;
         }
-      } else{ // cell newly added ==> no line to empty space above
-        return null;
+      }
+      if(relations[index] == index){ // this cell didnt change position
+        return <line
+          x1="0"
+          y1={-yLength}
+          x2="0"
+          y2={-yOffset+yLength}
+          strokeWidth={2}
+          stroke="rgb(0,0,0)"/>
+      }else{ // this cell changed position
+        return <line
+          x1={(relations[index]-index) * xLength}
+          y1={-yLength}
+          x2="0"
+          y2={-yOffset+yLength}
+          strokeWidth={2}
+          stroke="rgb(0,0,0)"/>
       }
     }
 
