@@ -152,6 +152,8 @@ function ProvVis<T, S extends string, A>({
     ]
 
 
+
+
     // Find nodes in the clusters whose entire cluster is on the backbone.
     let conf: EventConfig<E> = {}
     let counter = 0;
@@ -199,6 +201,8 @@ function ProvVis<T, S extends string, A>({
 
 
   const [expandedClusterList, setExpandedClusterList] = useState<string[]>(Object.keys(bundleMap));
+
+
 
   if(!eventConfig && eventTypes.size > 0 && eventTypes.size < 8)
   {
