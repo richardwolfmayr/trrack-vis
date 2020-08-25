@@ -119,6 +119,7 @@ function BackboneNode(_a) {
         }
         event.stopPropagation();
     }
+    // ------------- np_jupyterlab
     function CellsVis() {
         var cellsVis;
         var squareSideLength = cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15);
@@ -189,23 +190,6 @@ function BackboneNode(_a) {
             }
         }
     }
-    // not needed if I encode the different cell types in color
-    // function createSymbolPath(cell: { cell?: any; cell_type?: any; }){
-    //   switch (cell.cell_type) { // why cells.cells? At the call it is cell, but here it is cell.cell RW
-    //     case "code": {
-    //       return symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!;
-    //       break;
-    //     }
-    //     case "markdown": {
-    //       return symbol().type(symbolWye).size(cellsVisArea ? cellsVisArea : 15)()!;
-    //       break;
-    //     }
-    //     case "raw": {
-    //       return symbol().type(symbolTriangle).size(cellsVisArea ? cellsVisArea : 15)()!;
-    //       break;
-    //     }
-    //   }
-    // }
 }
 exports.default = BackboneNode;
 // const Label: FC<{ label: string } & React.SVGProps<SVGTextElement>> = (props: {
