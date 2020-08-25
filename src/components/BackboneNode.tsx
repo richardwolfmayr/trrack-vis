@@ -123,7 +123,7 @@ function BackboneNode<T, S extends string, A>({
   let label: string = "";
   let annotate: string = "";
 
-  //console.log(bundleMap)
+  console.log(bundleMap)
   //console.log(nodeMap[node.id]);
 
   if (bundleMap && Object.keys(bundleMap).includes(node.id) && node.ephemeral && expandedClusterList && !expandedClusterList.includes(node.id))
@@ -453,5 +453,7 @@ export default BackboneNode;
 // }) => {
 //   return <text {...props}>{props.label}</text>;
 // };
+
+// this is a test
 
 
