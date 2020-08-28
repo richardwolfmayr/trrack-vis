@@ -123,7 +123,6 @@ function BackboneNode<T, S extends string, A>({
   let label: string = "";
   let annotate: string = "";
 
-  console.log(bundleMap)
   //console.log(nodeMap[node.id]);
 
   if (bundleMap && Object.keys(bundleMap).includes(node.id) && node.ephemeral && expandedClusterList && !expandedClusterList.includes(node.id))
@@ -376,18 +375,39 @@ function BackboneNode<T, S extends string, A>({
     cell,
     index
   }: CellsLineProps){
+
     let previousPosition = index;
     // @ts-ignore
-    let relations = prov.getExtraFromArtifact(node.id)[0].e.relations;
-    if(relations != null){ // cell added or moved
+    let cellPositions = prov.getExtraFromArtifact(node.id)[0].e.cellPositions;
+    if(cellPositions != null){ // cell added or moved
       // @ts-ignore
-      if(relations.length != node.state.model.cells.length) { // some cell was added
+      if(cellPositions.length == node.state.model.cells.length-1) { // some cell was added
         // @ts-ignore
-        if (relations[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || relations[index] == undefined) { // this is the new cell, undefined if on rightmost side
+        if (cellPositions[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
           return null;
         }
       }
-      if(relations[index] == index){ // this cell didnt change position
+      // @ts-ignore
+      if(cellPositions.length == node.state.model.cells.length+1) { // some cell was removed
+        if(cellPositions[index] == index) { // this cell didnt change position
+          return <line
+            x1="0"
+            y1={-yLength}
+            x2="0"
+            y2={-yOffset+yLength}
+            strokeWidth={2}
+            stroke="rgb(0,0,0)"/>
+        }else{
+          return <line
+            x1="0"
+            y1={-yLength}
+            x2={1 * xLength}
+            y2={-yOffset+yLength}
+            strokeWidth={2}
+            stroke="rgb(0,0,0)"/>
+        }
+      }
+      if(cellPositions[index] == index){ // this cell didnt change position
         return <line
           x1="0"
           y1={-yLength}
@@ -397,7 +417,7 @@ function BackboneNode<T, S extends string, A>({
           stroke="rgb(0,0,0)"/>
       }else{ // this cell changed position
         return <line
-          x1={(relations[index]-index) * xLength}
+          x1={(cellPositions[index]-index) * xLength}
           y1={-yLength}
           x2="0"
           y2={-yOffset+yLength}
@@ -406,7 +426,7 @@ function BackboneNode<T, S extends string, A>({
       }
     }
 
-    // If no relations info exists, then no cell has been added and no cell has been moved ==> just draw a line straight up
+    // If no cellPositions info exists, then no cell has been added and no cell has been moved ==> just draw a line straight up
     return <line
       x1="0"
       y1={-yLength}
@@ -453,7 +473,5 @@ export default BackboneNode;
 // }) => {
 //   return <text {...props}>{props.label}</text>;
 // };
-
-// this is a test
 
 
