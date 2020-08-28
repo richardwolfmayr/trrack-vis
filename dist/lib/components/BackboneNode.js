@@ -35,7 +35,6 @@ function BackboneNode(_a) {
     }
     var label = "";
     var annotate = "";
-    //console.log(bundleMap)
     //console.log(nodeMap[node.id]);
     if (bundleMap && Object.keys(bundleMap).includes(node.id) && node.ephemeral && expandedClusterList && !expandedClusterList.includes(node.id)) {
         if (node.metadata && node.metadata.type) {
@@ -119,6 +118,7 @@ function BackboneNode(_a) {
         }
         event.stopPropagation();
     }
+    // ------------- np_jupyterlab
     function CellsVis() {
         var cellsVis;
         var squareSideLength = cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15);
@@ -142,23 +142,32 @@ function BackboneNode(_a) {
         var yLength = _a.yLength, xLength = _a.xLength, cell = _a.cell, index = _a.index;
         var previousPosition = index;
         // @ts-ignore
-        var relations = prov.getExtraFromArtifact(node.id)[0].e.relations;
-        if (relations != null) { // cell added or moved
+        var cellPositions = prov.getExtraFromArtifact(node.id)[0].e.cellPositions;
+        if (cellPositions != null) { // cell added or moved
             // @ts-ignore
-            if (relations.length != node.state.model.cells.length) { // some cell was added
+            if (cellPositions.length == node.state.model.cells.length - 1) { // some cell was added
                 // @ts-ignore
-                if (relations[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || relations[index] == undefined) { // this is the new cell, undefined if on rightmost side
+                if (cellPositions[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
                     return null;
                 }
             }
-            if (relations[index] == index) { // this cell didnt change position
+            // @ts-ignore
+            if (cellPositions.length == node.state.model.cells.length + 1) { // some cell was removed
+                if (cellPositions[index] == index) { // this cell didnt change position
+                    return react_1.default.createElement("line", { x1: "0", y1: -yLength, x2: "0", y2: -yOffset + yLength, strokeWidth: 2, stroke: "rgb(0,0,0)" });
+                }
+                else {
+                    return react_1.default.createElement("line", { x1: "0", y1: -yLength, x2: 1 * xLength, y2: -yOffset + yLength, strokeWidth: 2, stroke: "rgb(0,0,0)" });
+                }
+            }
+            if (cellPositions[index] == index) { // this cell didnt change position
                 return react_1.default.createElement("line", { x1: "0", y1: -yLength, x2: "0", y2: -yOffset + yLength, strokeWidth: 2, stroke: "rgb(0,0,0)" });
             }
             else { // this cell changed position
-                return react_1.default.createElement("line", { x1: (relations[index] - index) * xLength, y1: -yLength, x2: "0", y2: -yOffset + yLength, strokeWidth: 2, stroke: "rgb(0,0,0)" });
+                return react_1.default.createElement("line", { x1: (cellPositions[index] - index) * xLength, y1: -yLength, x2: "0", y2: -yOffset + yLength, strokeWidth: 2, stroke: "rgb(0,0,0)" });
             }
         }
-        // If no relations info exists, then no cell has been added and no cell has been moved ==> just draw a line straight up
+        // If no cellPositions info exists, then no cell has been added and no cell has been moved ==> just draw a line straight up
         return react_1.default.createElement("line", { x1: "0", y1: -yLength, x2: "0", y2: -yOffset + yLength, strokeWidth: 2, stroke: "rgb(0,0,0)" });
     }
     function symbolColor(cell, index) {
@@ -189,23 +198,6 @@ function BackboneNode(_a) {
             }
         }
     }
-    // not needed if I encode the different cell types in color
-    // function createSymbolPath(cell: { cell?: any; cell_type?: any; }){
-    //   switch (cell.cell_type) { // why cells.cells? At the call it is cell, but here it is cell.cell RW
-    //     case "code": {
-    //       return symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!;
-    //       break;
-    //     }
-    //     case "markdown": {
-    //       return symbol().type(symbolWye).size(cellsVisArea ? cellsVisArea : 15)()!;
-    //       break;
-    //     }
-    //     case "raw": {
-    //       return symbol().type(symbolTriangle).size(cellsVisArea ? cellsVisArea : 15)()!;
-    //       break;
-    //     }
-    //   }
-    // }
 }
 exports.default = BackboneNode;
 // const Label: FC<{ label: string } & React.SVGProps<SVGTextElement>> = (props: {
