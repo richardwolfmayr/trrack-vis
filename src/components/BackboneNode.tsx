@@ -333,10 +333,10 @@ function BackboneNode<T, S extends string, A>({
     let cellsVis;
     let squareSideLength = cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15);
     let xLength = (squareSideLength + 6);
-    // @ts-ignore
-    let nodeExtra: {cellPositions: Array<number>,changedCellId: number} = prov.getExtraFromArtifact(node.id)[0].e;
-    // @ts-ignore
+        // @ts-ignore
     if (node.state.model.cells != null) {
+      // @ts-ignore
+      let nodeExtra: {cellPositions: Array<number>,changedCellId: number} = prov.getExtraFromArtifact(node.id)[0].e;
       // @ts-ignore
       cellsVis = node.state.model.cells.map((cell, index) =>
         <g key={index}
