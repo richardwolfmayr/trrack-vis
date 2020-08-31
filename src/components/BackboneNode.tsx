@@ -294,7 +294,6 @@ function BackboneNode<T, S extends string, A>({
           {
             <CellsVis/>
           }
-          {/* {cellsVis} */}
         </>
       )}
     </Animate>
@@ -329,13 +328,13 @@ function BackboneNode<T, S extends string, A>({
     event.stopPropagation();
   }
 
-
-
   // ------------- np_jupyterlab
   function CellsVis() {
     let cellsVis;
     let squareSideLength = cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15);
     let xLength = (squareSideLength + 6);
+    // @ts-ignore
+    let nodeExtra: {cellPositions: Array<number>,changedCellId: number} = prov.getExtraFromArtifact(node.id)[0].e;
     // @ts-ignore
     if (node.state.model.cells != null) {
       // @ts-ignore
@@ -347,43 +346,40 @@ function BackboneNode<T, S extends string, A>({
             className={symbolColor(cell, index)}
             d={symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)()!}
           />
-          <CellsLine yLength={squareSideLength/2} xLength={xLength} cell={cell} index={index}/>
+          <CellsLine yLength={squareSideLength/2} xLength={xLength} index={index} nodeExtra={nodeExtra}/>
         </g>);
     }
     // @ts-ignore
-
     if (node.state.model.cells != null) {
       return <g>
         {cellsVis}
       </g>;
     }
-
     return null;
   }
-
 
   interface CellsLineProps {
     yLength: number,
     xLength: number,
-    cell:{cell_type: string},
-    index: number
+    index: number,
+    nodeExtra: {
+      cellPositions: Array<number>,
+      changedCellId: number
+    }
   }
 
   function CellsLine({
     yLength,
     xLength,
-    cell,
-    index
+    index,
+    nodeExtra
   }: CellsLineProps){
-
-    let previousPosition = index;
-    // @ts-ignore
-    let cellPositions = prov.getExtraFromArtifact(node.id)[0].e.cellPositions;
+    let cellPositions = nodeExtra.cellPositions;
     if(cellPositions != null){ // cell added or moved
       // @ts-ignore
       if(cellPositions.length == node.state.model.cells.length-1) { // some cell was added
         // @ts-ignore
-        if (cellPositions[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
+        if (cellPositions[index] == nodeExtra.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
           return null;
         }
       }
@@ -434,6 +430,7 @@ function BackboneNode<T, S extends string, A>({
       y2={-yOffset+yLength}
       strokeWidth={2}
       stroke="rgb(0,0,0)"/>
+
   }
 
   function symbolColor(cell: { cell_type?: any; }, index: number){
@@ -467,11 +464,3 @@ function BackboneNode<T, S extends string, A>({
 }
 
 export default BackboneNode;
-
-// const Label: FC<{ label: string } & React.SVGProps<SVGTextElement>> = (props: {
-//   label: string;
-// }) => {
-//   return <text {...props}>{props.label}</text>;
-// };
-
-
