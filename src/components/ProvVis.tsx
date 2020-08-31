@@ -351,6 +351,8 @@ function ProvVis<T, S extends string, A>({
     }
   }
 
+  maxHeight = maxHeight * verticalSpace + 200;
+
   const links = stratifiedTree.links();
 
   const xOffset = gutter;
@@ -436,12 +438,17 @@ function ProvVis<T, S extends string, A>({
     overflowY: "auto",
   } as React.CSSProperties;
 
+  let undoRedoStickyStyle = {
+    position: "sticky",
+    top: 0
+  } as React.CSSProperties;
+
 
   console.log(links);
 
   return (
-    <div style={overflowStyle} className={container} id="prov-vis">
-      <div id="undoRedoDiv">
+    <div>
+      <div id="undoRedoDiv" style={undoRedoStickyStyle}>
         <UndoRedoButton
           graph={prov ? prov.graph() : undefined}
           undoCallback = {() => {
@@ -476,202 +483,204 @@ function ProvVis<T, S extends string, A>({
           }}
         />
       </div>
-      <svg
-        style={{ overflow: "visible" }}
-        id={"topSvg"}
-        height={maxHeight < height ? height : maxHeight}
-        width={svgWidth}
-      >
-        <rect height={height} width={width} fill="none" stroke="none" />
-        <g id={"globalG"} transform={translate(shiftLeft, topOffset)}>
-          <NodeGroup
-            data={links}
-            keyAccessor={(link) => `${link.source.id}${link.target.id}`}
-            {...linkTransitions(
-              xOffset,
-              yOffset,
-              clusterVerticalSpace,
-              backboneGutter - gutter,
-              duration,
-              stratifiedList,
-              stratifiedMap,
-              annotationOpen,
-              annotationHeight,
-              bundleMap
-            )}
-          >
-            {(linkArr) => (
-              <>
-                {linkArr.map((link) => {
-                  const { key, state } = link;
-                  // console.log(linkArr);
-                  return (
-                    <g key={key}>
-                      <Link
-                        {...state}
-                        fill={'#ccc'}
-                        stroke={'#ccc'}
-                        strokeWidth={linkWidth}
-                      />
-                    </g>
-                  );
-                })}
-              </>
-            )}
-          </NodeGroup>
-          <NodeGroup
-            data={stratifiedList}
-            keyAccessor={(d) => d.id}
-
-            {...nodeTransitions(
-              xOffset,
-              yOffset,
-              clusterVerticalSpace,
-              backboneGutter - gutter,
-              duration,
-              stratifiedList,
-              stratifiedMap,
-              annotationOpen,
-              annotationHeight,
-              bundleMap
-            )}
-          >
-            {(nodes) => {
-              return (
+      <div style={overflowStyle} className={container} id="prov-vis">
+        <svg
+          style={{ overflow: "visible" }}
+          id={"topSvg"}
+          height={maxHeight < height ? height : maxHeight}
+          width={svgWidth}
+        >
+          <rect height={height} width={width} fill="none" stroke="none" />
+          <g id={"globalG"} transform={translate(shiftLeft, topOffset)}>
+            <NodeGroup
+              data={links}
+              keyAccessor={(link) => `${link.source.id}${link.target.id}`}
+              {...linkTransitions(
+                xOffset,
+                yOffset,
+                clusterVerticalSpace,
+                backboneGutter - gutter,
+                duration,
+                stratifiedList,
+                stratifiedMap,
+                annotationOpen,
+                annotationHeight,
+                bundleMap
+              )}
+            >
+              {(linkArr) => (
                 <>
-                  {nodes.map((node) => {
-                    const { data: d, key, state } = node;
-                    const popupTrigger = (
-                      <g
-                        key={key}
-                        onClick={() => {
-                          if (changeCurrent) {
-                            changeCurrent(d.id);
-                          }
-                        }}
-                        transform={
-                          d.width === 0
-                            ? translate(state.x, state.y)
-                            : translate(state.x, state.y)
-                        }
-                      >
-                        {d.width === 0 ? (
-                          <BackboneNode
-                            prov={prov}
-                            textSize={textSize}
-                            iconOnly={iconOnly}
-                            radius={backboneCircleRadius}
-                            strokeWidth={backboneCircleStroke}
-                            duration={duration}
-                            first={first}
-                            current={current === d.id}
-                            node={d.data}
-                            setBookmark={setBookmark}
-                            bookmark={bookmark}
-                            bundleMap={bundleMap}
-                            nodeMap={stratifiedMap}
-                            clusterLabels={clusterLabels}
-                            annotationOpen={annotationOpen}
-                            setAnnotationOpen={setAnnotationOpen}
-                            exemptList={expandedClusterList}
-                            editAnnotations={editAnnotations}
-                            setExemptList={setExpandedClusterList}
-                            eventConfig={eventConfig}
-                            annotationContent={annotationContent}
-                            popupContent={popupContent}
-                            expandedClusterList={expandedClusterList}
-                            cellsVisArea={cellsVisArea}
-                            yOffset={yOffset}
-                          />
-                        ) : popupContent !== undefined ? (
-                          <Popup
-                            content={popupContent(d.data)}
-                            trigger={
-                              <g
-                                onClick={() => {
-                                  setAnnotationOpen(-1);
-                                }}
-                              >
-                                {keys.includes(d.id)
-                                  ? bundleGlyph(d.data)
-                                  : regularGlyph(d.data)}
-                              </g>
-                            }
-                          />
-
-                        ) : (
-                          <g
-                            onClick={() => {
-                              setAnnotationOpen(-1);
-                            }}
-                          >
-                            {regularGlyph(d.data)}
-                          </g>
-                        )}
+                  {linkArr.map((link) => {
+                    const { key, state } = link;
+                    // console.log(linkArr);
+                    return (
+                      <g key={key}>
+                        <Link
+                          {...state}
+                          fill={'#ccc'}
+                          stroke={'#ccc'}
+                          strokeWidth={linkWidth}
+                        />
                       </g>
                     );
-
-                    return popupTrigger;
                   })}
                 </>
-              );
-            }}
-          </NodeGroup>
-          <NodeGroup
-            data={keys}
-            keyAccessor={(key) => `${key}`}
-            {...bundleTransitions(
-              xOffset,
-              verticalSpace,
-              clusterVerticalSpace,
-              backboneGutter - gutter,
-              duration,
-              expandedClusterList,
-              stratifiedMap,
-              stratifiedList,
-              annotationOpen,
-              annotationHeight,
-              bundleMap
-            )}
-          >
-            {(bundle) => (
-              <>
-                {bundle.map((b) => {
-                  const { key, state } = b;
-                  if (
-                    bundleMap === undefined ||
-                    (stratifiedMap[b.key] as any).width !== 0 ||
-                    state.validity === false
-                  ) {
-                    return null;
-                  }
+              )}
+            </NodeGroup>
+            <NodeGroup
+              data={stratifiedList}
+              keyAccessor={(d) => d.id}
 
-                  return (
-                    <g
-                      key={key}
-                      transform={translate(
-                        state.x - gutter + 5,
-                        state.y - clusterVerticalSpace / 2
-                      )}
-                    >
-                      <rect
-                        style={{ opacity: state.opacity }}
-                        width={iconOnly ? 42 : sideOffset - 15}
-                        height={state.height}
-                        rx="10"
-                        ry="10"
-                        fill="none"
-                        strokeWidth="2px"
-                        stroke="rgb(248, 191, 132)"
-                      ></rect>
-                    </g>
-                  );
-                })}
-              </>
-            )}
-          </NodeGroup>
-        </g>
-      </svg>
+              {...nodeTransitions(
+                xOffset,
+                yOffset,
+                clusterVerticalSpace,
+                backboneGutter - gutter,
+                duration,
+                stratifiedList,
+                stratifiedMap,
+                annotationOpen,
+                annotationHeight,
+                bundleMap
+              )}
+            >
+              {(nodes) => {
+                return (
+                  <>
+                    {nodes.map((node) => {
+                      const { data: d, key, state } = node;
+                      const popupTrigger = (
+                        <g
+                          key={key}
+                          onClick={() => {
+                            if (changeCurrent) {
+                              changeCurrent(d.id);
+                            }
+                          }}
+                          transform={
+                            d.width === 0
+                              ? translate(state.x, state.y)
+                              : translate(state.x, state.y)
+                          }
+                        >
+                          {d.width === 0 ? (
+                            <BackboneNode
+                              prov={prov}
+                              textSize={textSize}
+                              iconOnly={iconOnly}
+                              radius={backboneCircleRadius}
+                              strokeWidth={backboneCircleStroke}
+                              duration={duration}
+                              first={first}
+                              current={current === d.id}
+                              node={d.data}
+                              setBookmark={setBookmark}
+                              bookmark={bookmark}
+                              bundleMap={bundleMap}
+                              nodeMap={stratifiedMap}
+                              clusterLabels={clusterLabels}
+                              annotationOpen={annotationOpen}
+                              setAnnotationOpen={setAnnotationOpen}
+                              exemptList={expandedClusterList}
+                              editAnnotations={editAnnotations}
+                              setExemptList={setExpandedClusterList}
+                              eventConfig={eventConfig}
+                              annotationContent={annotationContent}
+                              popupContent={popupContent}
+                              expandedClusterList={expandedClusterList}
+                              cellsVisArea={cellsVisArea}
+                              yOffset={yOffset}
+                            />
+                          ) : popupContent !== undefined ? (
+                            <Popup
+                              content={popupContent(d.data)}
+                              trigger={
+                                <g
+                                  onClick={() => {
+                                    setAnnotationOpen(-1);
+                                  }}
+                                >
+                                  {keys.includes(d.id)
+                                    ? bundleGlyph(d.data)
+                                    : regularGlyph(d.data)}
+                                </g>
+                              }
+                            />
+
+                          ) : (
+                            <g
+                              onClick={() => {
+                                setAnnotationOpen(-1);
+                              }}
+                            >
+                              {regularGlyph(d.data)}
+                            </g>
+                          )}
+                        </g>
+                      );
+
+                      return popupTrigger;
+                    })}
+                  </>
+                );
+              }}
+            </NodeGroup>
+            <NodeGroup
+              data={keys}
+              keyAccessor={(key) => `${key}`}
+              {...bundleTransitions(
+                xOffset,
+                verticalSpace,
+                clusterVerticalSpace,
+                backboneGutter - gutter,
+                duration,
+                expandedClusterList,
+                stratifiedMap,
+                stratifiedList,
+                annotationOpen,
+                annotationHeight,
+                bundleMap
+              )}
+            >
+              {(bundle) => (
+                <>
+                  {bundle.map((b) => {
+                    const { key, state } = b;
+                    if (
+                      bundleMap === undefined ||
+                      (stratifiedMap[b.key] as any).width !== 0 ||
+                      state.validity === false
+                    ) {
+                      return null;
+                    }
+
+                    return (
+                      <g
+                        key={key}
+                        transform={translate(
+                          state.x - gutter + 5,
+                          state.y - clusterVerticalSpace / 2
+                        )}
+                      >
+                        <rect
+                          style={{ opacity: state.opacity }}
+                          width={iconOnly ? 42 : sideOffset - 15}
+                          height={state.height}
+                          rx="10"
+                          ry="10"
+                          fill="none"
+                          strokeWidth="2px"
+                          stroke="rgb(248, 191, 132)"
+                        ></rect>
+                      </g>
+                    );
+                  })}
+                </>
+              )}
+            </NodeGroup>
+          </g>
+        </svg>
+      </div>
     </div>
   );
 }
