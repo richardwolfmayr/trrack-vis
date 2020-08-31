@@ -126,10 +126,12 @@ function BackboneNode(_a) {
         // @ts-ignore
         if (node.state.model.cells != null) {
             // @ts-ignore
+            var nodeExtra_1 = prov.getExtraFromArtifact(node.id)[0].e;
+            // @ts-ignore
             cellsVis = node.state.model.cells.map(function (cell, index) {
                 return react_1.default.createElement("g", { key: index, transform: translate_1.default(20 + xLength * index, 0) },
                     react_1.default.createElement("path", { strokeWidth: 2, className: symbolColor(cell, index), d: d3_shape_1.symbol().type(d3_shape_1.symbolSquare).size(cellsVisArea ? cellsVisArea : 15)() }),
-                    react_1.default.createElement(CellsLine, { yLength: squareSideLength / 2, xLength: xLength, cell: cell, index: index }));
+                    react_1.default.createElement(CellsLine, { yLength: squareSideLength / 2, xLength: xLength, index: index, nodeExtra: nodeExtra_1 }));
             });
         }
         // @ts-ignore
@@ -139,15 +141,13 @@ function BackboneNode(_a) {
         return null;
     }
     function CellsLine(_a) {
-        var yLength = _a.yLength, xLength = _a.xLength, cell = _a.cell, index = _a.index;
-        var previousPosition = index;
-        // @ts-ignore
-        var cellPositions = prov.getExtraFromArtifact(node.id)[0].e.cellPositions;
+        var yLength = _a.yLength, xLength = _a.xLength, index = _a.index, nodeExtra = _a.nodeExtra;
+        var cellPositions = nodeExtra.cellPositions;
         if (cellPositions != null) { // cell added or moved
             // @ts-ignore
             if (cellPositions.length == node.state.model.cells.length - 1) { // some cell was added
                 // @ts-ignore
-                if (cellPositions[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
+                if (cellPositions[index] == nodeExtra.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
                     return null;
                 }
             }
@@ -200,9 +200,4 @@ function BackboneNode(_a) {
     }
 }
 exports.default = BackboneNode;
-// const Label: FC<{ label: string } & React.SVGProps<SVGTextElement>> = (props: {
-//   label: string;
-// }) => {
-//   return <text {...props}>{props.label}</text>;
-// };
 //# sourceMappingURL=BackboneNode.js.map

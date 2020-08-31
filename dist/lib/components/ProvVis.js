@@ -249,6 +249,7 @@ function ProvVis(_a) {
             maxWidth = stratifiedList[j].width;
         }
     }
+    maxHeight = maxHeight * verticalSpace + 200;
     var links = stratifiedTree.links();
     var xOffset = gutter;
     var yOffset = verticalSpace;
@@ -308,9 +309,14 @@ function ProvVis(_a) {
         overflowX: "auto",
         overflowY: "auto",
     };
-    console.log(links);
-    return (react_1.default.createElement("div", { style: overflowStyle, className: container, id: "prov-vis" },
-        react_1.default.createElement("div", { id: "undoRedoDiv" },
+    var undoRedoStickyStyle = {
+        position: "sticky",
+        top: 0
+    };
+    // let bundleRectPadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) * maxNumberOfCells; // the rectangular for the bundled nodes needs to be bigger because of the cells
+    var cellsBundlePadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) + 6;
+    return (react_1.default.createElement("div", null,
+        react_1.default.createElement("div", { id: "undoRedoDiv", style: undoRedoStickyStyle },
             react_1.default.createElement(UndoRedoButton_1.default, { graph: prov ? prov.graph() : undefined, undoCallback: function () {
                     if (prov) {
                         if (ephemeralUndo) {
@@ -336,44 +342,47 @@ function ProvVis(_a) {
                         return;
                     }
                 } })),
-        react_1.default.createElement("svg", { style: { overflow: "visible" }, id: "topSvg", height: maxHeight < height ? height : maxHeight, width: svgWidth },
-            react_1.default.createElement("rect", { height: height, width: width, fill: "none", stroke: "none" }),
-            react_1.default.createElement("g", { id: "globalG", transform: translate_1.default(shiftLeft, topOffset) },
-                react_1.default.createElement(react_move_1.NodeGroup, __assign({ data: links, keyAccessor: function (link) { return "" + link.source.id + link.target.id; } }, LinkTransitions_1.default(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (linkArr) { return (react_1.default.createElement(react_1.default.Fragment, null, linkArr.map(function (link) {
-                    var key = link.key, state = link.state;
-                    // console.log(linkArr);
-                    return (react_1.default.createElement("g", { key: key },
-                        react_1.default.createElement(Link_1.default, __assign({}, state, { fill: '#ccc', stroke: '#ccc', strokeWidth: linkWidth }))));
-                }))); }),
-                react_1.default.createElement(react_move_1.NodeGroup, __assign({ data: stratifiedList, keyAccessor: function (d) { return d.id; } }, NodeTransitions_1.default(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (nodes) {
-                    return (react_1.default.createElement(react_1.default.Fragment, null, nodes.map(function (node) {
-                        var d = node.data, key = node.key, state = node.state;
-                        var popupTrigger = (react_1.default.createElement("g", { key: key, onClick: function () {
-                                if (changeCurrent) {
-                                    changeCurrent(d.id);
-                                }
-                            }, transform: d.width === 0
-                                ? translate_1.default(state.x, state.y)
-                                : translate_1.default(state.x, state.y) }, d.width === 0 ? (react_1.default.createElement(BackboneNode_1.default, { prov: prov, textSize: textSize, iconOnly: iconOnly, radius: backboneCircleRadius, strokeWidth: backboneCircleStroke, duration: duration, first: first, current: current === d.id, node: d.data, setBookmark: setBookmark, bookmark: bookmark, bundleMap: bundleMap, nodeMap: stratifiedMap, clusterLabels: clusterLabels, annotationOpen: annotationOpen, setAnnotationOpen: setAnnotationOpen, exemptList: expandedClusterList, editAnnotations: editAnnotations, setExemptList: setExpandedClusterList, eventConfig: eventConfig, annotationContent: annotationContent, popupContent: popupContent, expandedClusterList: expandedClusterList, cellsVisArea: cellsVisArea, yOffset: yOffset })) : popupContent !== undefined ? (react_1.default.createElement(semantic_ui_react_1.Popup, { content: popupContent(d.data), trigger: react_1.default.createElement("g", { onClick: function () {
+        react_1.default.createElement("div", { style: overflowStyle, className: container, id: "prov-vis" },
+            react_1.default.createElement("svg", { style: { overflow: "visible" }, id: "topSvg", height: maxHeight < height ? height : maxHeight, width: svgWidth },
+                react_1.default.createElement("rect", { height: height, width: width, fill: "none", stroke: "none" }),
+                react_1.default.createElement("g", { id: "globalG", transform: translate_1.default(shiftLeft, topOffset) },
+                    react_1.default.createElement(react_move_1.NodeGroup, __assign({ data: links, keyAccessor: function (link) { return "" + link.source.id + link.target.id; } }, LinkTransitions_1.default(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (linkArr) { return (react_1.default.createElement(react_1.default.Fragment, null, linkArr.map(function (link) {
+                        var key = link.key, state = link.state;
+                        // console.log(linkArr);
+                        return (react_1.default.createElement("g", { key: key },
+                            react_1.default.createElement(Link_1.default, __assign({}, state, { fill: '#ccc', stroke: '#ccc', strokeWidth: linkWidth }))));
+                    }))); }),
+                    react_1.default.createElement(react_move_1.NodeGroup, __assign({ data: stratifiedList, keyAccessor: function (d) { return d.id; } }, NodeTransitions_1.default(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (nodes) {
+                        return (react_1.default.createElement(react_1.default.Fragment, null, nodes.map(function (node) {
+                            var d = node.data, key = node.key, state = node.state;
+                            var popupTrigger = (react_1.default.createElement("g", { key: key, onClick: function () {
+                                    if (changeCurrent) {
+                                        changeCurrent(d.id);
+                                    }
+                                }, transform: d.width === 0
+                                    ? translate_1.default(state.x, state.y)
+                                    : translate_1.default(state.x, state.y) }, d.width === 0 ? (react_1.default.createElement(BackboneNode_1.default, { prov: prov, textSize: textSize, iconOnly: iconOnly, radius: backboneCircleRadius, strokeWidth: backboneCircleStroke, duration: duration, first: first, current: current === d.id, node: d.data, setBookmark: setBookmark, bookmark: bookmark, bundleMap: bundleMap, nodeMap: stratifiedMap, clusterLabels: clusterLabels, annotationOpen: annotationOpen, setAnnotationOpen: setAnnotationOpen, exemptList: expandedClusterList, editAnnotations: editAnnotations, setExemptList: setExpandedClusterList, eventConfig: eventConfig, annotationContent: annotationContent, popupContent: popupContent, expandedClusterList: expandedClusterList, cellsVisArea: cellsVisArea, yOffset: yOffset })) : popupContent !== undefined ? (react_1.default.createElement(semantic_ui_react_1.Popup, { content: popupContent(d.data), trigger: react_1.default.createElement("g", { onClick: function () {
+                                        setAnnotationOpen(-1);
+                                    } }, keys.includes(d.id)
+                                    ? bundleGlyph(d.data)
+                                    : regularGlyph(d.data)) })) : (react_1.default.createElement("g", { onClick: function () {
                                     setAnnotationOpen(-1);
-                                } }, keys.includes(d.id)
-                                ? bundleGlyph(d.data)
-                                : regularGlyph(d.data)) })) : (react_1.default.createElement("g", { onClick: function () {
-                                setAnnotationOpen(-1);
-                            } }, regularGlyph(d.data)))));
-                        return popupTrigger;
-                    })));
-                }),
-                react_1.default.createElement(react_move_1.NodeGroup, __assign({ data: keys, keyAccessor: function (key) { return "" + key; } }, BundleTransitions_1.default(xOffset, verticalSpace, clusterVerticalSpace, backboneGutter - gutter, duration, expandedClusterList, stratifiedMap, stratifiedList, annotationOpen, annotationHeight, bundleMap)), function (bundle) { return (react_1.default.createElement(react_1.default.Fragment, null, bundle.map(function (b) {
-                    var key = b.key, state = b.state;
-                    if (bundleMap === undefined ||
-                        stratifiedMap[b.key].width !== 0 ||
-                        state.validity === false) {
-                        return null;
-                    }
-                    return (react_1.default.createElement("g", { key: key, transform: translate_1.default(state.x - gutter + 5, state.y - clusterVerticalSpace / 2) },
-                        react_1.default.createElement("rect", { style: { opacity: state.opacity }, width: iconOnly ? 42 : sideOffset - 15, height: state.height, rx: "10", ry: "10", fill: "none", strokeWidth: "2px", stroke: "rgb(248, 191, 132)" })));
-                }))); })))));
+                                } }, regularGlyph(d.data)))));
+                            return popupTrigger;
+                        })));
+                    }),
+                    react_1.default.createElement(react_move_1.NodeGroup, __assign({ data: keys, keyAccessor: function (key) { return "" + key; } }, BundleTransitions_1.default(xOffset, verticalSpace, clusterVerticalSpace, backboneGutter - gutter, duration, expandedClusterList, stratifiedMap, stratifiedList, annotationOpen, annotationHeight, bundleMap)), function (bundle) { return (react_1.default.createElement(react_1.default.Fragment, null, bundle.map(function (b) {
+                        var key = b.key, state = b.state;
+                        if (bundleMap === undefined ||
+                            stratifiedMap[b.key].width !== 0 ||
+                            state.validity === false) {
+                            return null;
+                        }
+                        // @ts-ignore
+                        var bundleRectPadding = stratifiedMap[b.key].data.state.model.cells.length * cellsBundlePadding;
+                        return (react_1.default.createElement("g", { key: key, transform: translate_1.default(state.x - gutter + 5, state.y - clusterVerticalSpace / 2) },
+                            react_1.default.createElement("rect", { style: { opacity: state.opacity }, width: (iconOnly ? 42 : sideOffset - 15) + bundleRectPadding + 5, height: state.height, rx: "10", ry: "10", fill: "none", strokeWidth: "2px", stroke: "rgb(248, 191, 132)" })));
+                    }))); }))))));
 }
 exports.default = ProvVis;
 var container = typestyle_1.style({

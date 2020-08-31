@@ -54454,10 +54454,12 @@ function BackboneNode(_a) {
         // @ts-ignore
         if (node.state.model.cells != null) {
             // @ts-ignore
+            var nodeExtra_1 = prov.getExtraFromArtifact(node.id)[0].e;
+            // @ts-ignore
             cellsVis = node.state.model.cells.map(function (cell, index) {
                 return React__default.createElement("g", { key: index, transform: translate(20 + xLength * index, 0) },
                     React__default.createElement("path", { strokeWidth: 2, className: symbolColor(cell, index), d: symbol().type(symbolSquare).size(cellsVisArea ? cellsVisArea : 15)() }),
-                    React__default.createElement(CellsLine, { yLength: squareSideLength / 2, xLength: xLength, cell: cell, index: index }));
+                    React__default.createElement(CellsLine, { yLength: squareSideLength / 2, xLength: xLength, index: index, nodeExtra: nodeExtra_1 }));
             });
         }
         // @ts-ignore
@@ -54467,14 +54469,13 @@ function BackboneNode(_a) {
         return null;
     }
     function CellsLine(_a) {
-        var yLength = _a.yLength, xLength = _a.xLength, cell = _a.cell, index = _a.index;
-        // @ts-ignore
-        var cellPositions = prov.getExtraFromArtifact(node.id)[0].e.cellPositions;
+        var yLength = _a.yLength, xLength = _a.xLength, index = _a.index, nodeExtra = _a.nodeExtra;
+        var cellPositions = nodeExtra.cellPositions;
         if (cellPositions != null) { // cell added or moved
             // @ts-ignore
             if (cellPositions.length == node.state.model.cells.length - 1) { // some cell was added
                 // @ts-ignore
-                if (cellPositions[index] == prov.getExtraFromArtifact(node.id)[0].e.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
+                if (cellPositions[index] == nodeExtra.changedCellId || cellPositions[index] == undefined) { // this is the new cell, undefined if on rightmost side
                     return null;
                 }
             }
@@ -54523,11 +54524,6 @@ function BackboneNode(_a) {
         }
     }
 }
-// const Label: FC<{ label: string } & React.SVGProps<SVGTextElement>> = (props: {
-//   label: string;
-// }) => {
-//   return <text {...props}>{props.label}</text>;
-// };
 
 function linkTransitions(xOffset, yOffset, clusterOffset, backboneOffset, duration, nodeList, nodeMap, annotationOpen, annotationHeight, bundleMap) {
     if (duration === void 0) { duration = 500; }
@@ -54998,6 +54994,7 @@ function ProvVis(_a) {
             maxWidth = stratifiedList[j].width;
         }
     }
+    maxHeight = maxHeight * verticalSpace + 200;
     var links = stratifiedTree.links();
     var xOffset = gutter;
     var yOffset = verticalSpace;
@@ -55057,9 +55054,14 @@ function ProvVis(_a) {
         overflowX: "auto",
         overflowY: "auto",
     };
-    console.log(links);
-    return (React__default.createElement("div", { style: overflowStyle, className: container, id: "prov-vis" },
-        React__default.createElement("div", { id: "undoRedoDiv" },
+    var undoRedoStickyStyle = {
+        position: "sticky",
+        top: 0
+    };
+    // let bundleRectPadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) * maxNumberOfCells; // the rectangular for the bundled nodes needs to be bigger because of the cells
+    var cellsBundlePadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) + 6;
+    return (React__default.createElement("div", null,
+        React__default.createElement("div", { id: "undoRedoDiv", style: undoRedoStickyStyle },
             React__default.createElement(UndoRedoButton, { graph: prov ? prov.graph() : undefined, undoCallback: function () {
                     if (prov) {
                         if (ephemeralUndo) {
@@ -55085,44 +55087,47 @@ function ProvVis(_a) {
                         return;
                     }
                 } })),
-        React__default.createElement("svg", { style: { overflow: "visible" }, id: "topSvg", height: maxHeight < height ? height : maxHeight, width: svgWidth },
-            React__default.createElement("rect", { height: height, width: width, fill: "none", stroke: "none" }),
-            React__default.createElement("g", { id: "globalG", transform: translate(shiftLeft, topOffset) },
-                React__default.createElement(NodeGroup, __assign({ data: links, keyAccessor: function (link) { return "" + link.source.id + link.target.id; } }, linkTransitions(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight)), function (linkArr) { return (React__default.createElement(React__default.Fragment, null, linkArr.map(function (link) {
-                    var key = link.key, state = link.state;
-                    // console.log(linkArr);
-                    return (React__default.createElement("g", { key: key },
-                        React__default.createElement(Link, __assign({}, state, { fill: '#ccc', stroke: '#ccc', strokeWidth: linkWidth }))));
-                }))); }),
-                React__default.createElement(NodeGroup, __assign({ data: stratifiedList, keyAccessor: function (d) { return d.id; } }, nodeTransitions(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (nodes) {
-                    return (React__default.createElement(React__default.Fragment, null, nodes.map(function (node) {
-                        var d = node.data, key = node.key, state = node.state;
-                        var popupTrigger = (React__default.createElement("g", { key: key, onClick: function () {
-                                if (changeCurrent) {
-                                    changeCurrent(d.id);
-                                }
-                            }, transform: d.width === 0
-                                ? translate(state.x, state.y)
-                                : translate(state.x, state.y) }, d.width === 0 ? (React__default.createElement(BackboneNode, { prov: prov, textSize: textSize, iconOnly: iconOnly, radius: backboneCircleRadius, strokeWidth: backboneCircleStroke, duration: duration, first: first, current: current === d.id, node: d.data, setBookmark: setBookmark, bookmark: bookmark, bundleMap: bundleMap, nodeMap: stratifiedMap, clusterLabels: clusterLabels, annotationOpen: annotationOpen, setAnnotationOpen: setAnnotationOpen, exemptList: expandedClusterList, editAnnotations: editAnnotations, setExemptList: setExpandedClusterList, eventConfig: eventConfig, annotationContent: annotationContent, popupContent: popupContent, expandedClusterList: expandedClusterList, cellsVisArea: cellsVisArea, yOffset: yOffset })) : popupContent !== undefined ? (React__default.createElement(Popup, { content: popupContent(d.data), trigger: React__default.createElement("g", { onClick: function () {
+        React__default.createElement("div", { style: overflowStyle, className: container, id: "prov-vis" },
+            React__default.createElement("svg", { style: { overflow: "visible" }, id: "topSvg", height: maxHeight < height ? height : maxHeight, width: svgWidth },
+                React__default.createElement("rect", { height: height, width: width, fill: "none", stroke: "none" }),
+                React__default.createElement("g", { id: "globalG", transform: translate(shiftLeft, topOffset) },
+                    React__default.createElement(NodeGroup, __assign({ data: links, keyAccessor: function (link) { return "" + link.source.id + link.target.id; } }, linkTransitions(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight)), function (linkArr) { return (React__default.createElement(React__default.Fragment, null, linkArr.map(function (link) {
+                        var key = link.key, state = link.state;
+                        // console.log(linkArr);
+                        return (React__default.createElement("g", { key: key },
+                            React__default.createElement(Link, __assign({}, state, { fill: '#ccc', stroke: '#ccc', strokeWidth: linkWidth }))));
+                    }))); }),
+                    React__default.createElement(NodeGroup, __assign({ data: stratifiedList, keyAccessor: function (d) { return d.id; } }, nodeTransitions(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (nodes) {
+                        return (React__default.createElement(React__default.Fragment, null, nodes.map(function (node) {
+                            var d = node.data, key = node.key, state = node.state;
+                            var popupTrigger = (React__default.createElement("g", { key: key, onClick: function () {
+                                    if (changeCurrent) {
+                                        changeCurrent(d.id);
+                                    }
+                                }, transform: d.width === 0
+                                    ? translate(state.x, state.y)
+                                    : translate(state.x, state.y) }, d.width === 0 ? (React__default.createElement(BackboneNode, { prov: prov, textSize: textSize, iconOnly: iconOnly, radius: backboneCircleRadius, strokeWidth: backboneCircleStroke, duration: duration, first: first, current: current === d.id, node: d.data, setBookmark: setBookmark, bookmark: bookmark, bundleMap: bundleMap, nodeMap: stratifiedMap, clusterLabels: clusterLabels, annotationOpen: annotationOpen, setAnnotationOpen: setAnnotationOpen, exemptList: expandedClusterList, editAnnotations: editAnnotations, setExemptList: setExpandedClusterList, eventConfig: eventConfig, annotationContent: annotationContent, popupContent: popupContent, expandedClusterList: expandedClusterList, cellsVisArea: cellsVisArea, yOffset: yOffset })) : popupContent !== undefined ? (React__default.createElement(Popup, { content: popupContent(d.data), trigger: React__default.createElement("g", { onClick: function () {
+                                        setAnnotationOpen(-1);
+                                    } }, keys.includes(d.id)
+                                    ? bundleGlyph(d.data)
+                                    : regularGlyph(d.data)) })) : (React__default.createElement("g", { onClick: function () {
                                     setAnnotationOpen(-1);
-                                } }, keys.includes(d.id)
-                                ? bundleGlyph(d.data)
-                                : regularGlyph(d.data)) })) : (React__default.createElement("g", { onClick: function () {
-                                setAnnotationOpen(-1);
-                            } }, regularGlyph(d.data)))));
-                        return popupTrigger;
-                    })));
-                }),
-                React__default.createElement(NodeGroup, __assign({ data: keys, keyAccessor: function (key) { return "" + key; } }, bundleTransitions(xOffset, verticalSpace, clusterVerticalSpace, backboneGutter - gutter, duration, expandedClusterList, stratifiedMap, stratifiedList, annotationOpen, annotationHeight, bundleMap)), function (bundle) { return (React__default.createElement(React__default.Fragment, null, bundle.map(function (b) {
-                    var key = b.key, state = b.state;
-                    if (bundleMap === undefined ||
-                        stratifiedMap[b.key].width !== 0 ||
-                        state.validity === false) {
-                        return null;
-                    }
-                    return (React__default.createElement("g", { key: key, transform: translate(state.x - gutter + 5, state.y - clusterVerticalSpace / 2) },
-                        React__default.createElement("rect", { style: { opacity: state.opacity }, width: iconOnly ? 42 : sideOffset - 15, height: state.height, rx: "10", ry: "10", fill: "none", strokeWidth: "2px", stroke: "rgb(248, 191, 132)" })));
-                }))); })))));
+                                } }, regularGlyph(d.data)))));
+                            return popupTrigger;
+                        })));
+                    }),
+                    React__default.createElement(NodeGroup, __assign({ data: keys, keyAccessor: function (key) { return "" + key; } }, bundleTransitions(xOffset, verticalSpace, clusterVerticalSpace, backboneGutter - gutter, duration, expandedClusterList, stratifiedMap, stratifiedList, annotationOpen, annotationHeight, bundleMap)), function (bundle) { return (React__default.createElement(React__default.Fragment, null, bundle.map(function (b) {
+                        var key = b.key, state = b.state;
+                        if (bundleMap === undefined ||
+                            stratifiedMap[b.key].width !== 0 ||
+                            state.validity === false) {
+                            return null;
+                        }
+                        // @ts-ignore
+                        var bundleRectPadding = stratifiedMap[b.key].data.state.model.cells.length * cellsBundlePadding;
+                        return (React__default.createElement("g", { key: key, transform: translate(state.x - gutter + 5, state.y - clusterVerticalSpace / 2) },
+                            React__default.createElement("rect", { style: { opacity: state.opacity }, width: (iconOnly ? 42 : sideOffset - 15) + bundleRectPadding + 5, height: state.height, rx: "10", ry: "10", fill: "none", strokeWidth: "2px", stroke: "rgb(248, 191, 132)" })));
+                    }))); }))))));
 }
 var container = style({
     alignItems: "center",
