@@ -443,8 +443,8 @@ function ProvVis<T, S extends string, A>({
     top: 0
   } as React.CSSProperties;
 
-
-  console.log(links);
+  // let bundleRectPadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) * maxNumberOfCells; // the rectangular for the bundled nodes needs to be bigger because of the cells
+  const cellsBundlePadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) + 6;
 
   return (
     <div>
@@ -653,7 +653,8 @@ function ProvVis<T, S extends string, A>({
                     ) {
                       return null;
                     }
-
+                    // @ts-ignore
+                    let bundleRectPadding = stratifiedMap[b.key].data.state.model.cells.length * cellsBundlePadding;
                     return (
                       <g
                         key={key}
@@ -664,7 +665,7 @@ function ProvVis<T, S extends string, A>({
                       >
                         <rect
                           style={{ opacity: state.opacity }}
-                          width={iconOnly ? 42 : sideOffset - 15}
+                          width={(iconOnly ? 42 : sideOffset - 15) + bundleRectPadding + 5}
                           height={state.height}
                           rx="10"
                           ry="10"
