@@ -20,6 +20,7 @@ import Link from './Link';
 import linkTransitions from './LinkTransitions';
 import nodeTransitions from './NodeTransitions';
 import { treeColor } from './Styles';
+import {Legend} from "./Legend";
 
 interface ProvVisProps<T, S extends string, A> {
   root: NodeID;
@@ -53,6 +54,7 @@ interface ProvVisProps<T, S extends string, A> {
   prov?: Provenance<T, S, A>;
   ephemeralUndo?: boolean;
   cellsVisArea?: number;
+  legend?: boolean;
 }
 
 export type StratifiedMap<T, S, A> = {
@@ -92,7 +94,8 @@ function ProvVis<T, S extends string, A>({
   undoRedoButtons = true,
   prov,
   ephemeralUndo = false,
-  cellsVisArea = 50
+  cellsVisArea = 50,
+  legend = false
 }: ProvVisProps<T, S, A>) {
   const [first, setFirst] = useState(true);
   const [bookmark, setBookmark] = useState(false);
@@ -448,6 +451,13 @@ function ProvVis<T, S extends string, A>({
 
   return (
     <div>
+      {legend &&
+        <Legend
+          eventConfig={eventConfig}
+          iconHeight={25}
+          iconWidth={25}
+        />
+      }
       <div id="undoRedoDiv" style={undoRedoStickyStyle}>
         <UndoRedoButton
           graph={prov ? prov.graph() : undefined}

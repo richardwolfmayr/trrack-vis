@@ -5,6 +5,7 @@ export type Config = {
   currentGlyph: ReactChild;
   backboneGlyph: ReactChild;
   bundleGlyph: ReactChild;
+  description: string;
 };
 
 export type EventConfig<E extends string> = {
