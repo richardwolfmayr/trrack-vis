@@ -28,6 +28,7 @@ export interface ProvVisConfig {
   linkWidth?: number;
   duration?: number;
   cellsVisArea?: number;
+  legend?: boolean;
 }
 
 export function ProvVisCreator<T, S extends string, A>(
