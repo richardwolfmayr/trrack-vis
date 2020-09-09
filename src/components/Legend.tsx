@@ -29,22 +29,32 @@ const eventDivStyle = style({
 
 
 interface LegendProps {
+  filters?: boolean
   eventConfig?: EventConfig<string>,
   iconHeight: number,
   iconWidth: number,
 }
 
+function redraw() {
+  console.log("redraw")
+}
+
 export function Legend({
+    filters,
     eventConfig,
     iconHeight,
     iconWidth
   }: LegendProps) {
   let eventTypeDescriptions = new Array<Object>();
   let transform = `translate(${iconHeight/2}, ${iconWidth/2-2.5})`;
+
   if(eventConfig){
     for (let key in eventConfig) {
       let event = eventConfig[key];
       let eventDiv = <div className={eventDivStyle} key={key}>
+        {filters &&
+        <input type="checkbox" id={key+" checkbox"} name={key} value={key} onClick={redraw}></input>
+        }
         <svg height={iconHeight} width={iconWidth} className={eventIconStyle} >
           <g transform={transform}>
             {event.backboneGlyph}
@@ -55,6 +65,10 @@ export function Legend({
       eventTypeDescriptions.push(eventDiv);
     }
   }
+
+
+
+
   return <div id="Legend" className={legendBorderDivStyle}>
     {eventTypeDescriptions}
   </div>

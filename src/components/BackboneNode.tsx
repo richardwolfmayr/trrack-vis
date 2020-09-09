@@ -324,7 +324,6 @@ function BackboneNode<T, S extends string, A>({
 
       setExemptList(exemptCopy);
     }
-
     event.stopPropagation();
   }
 

@@ -4,7 +4,7 @@ import { HierarchyNode, stratify, Symbol, symbol, symbolWye, symbolCross, symbol
 
 import React, { ReactChild, useEffect, useState } from 'react';
 import { NodeGroup } from 'react-move';
-import { Popup } from 'semantic-ui-react';
+import {CheckboxProps, Popup} from 'semantic-ui-react';
 import { style } from 'typestyle';
 
 import { BundleMap } from '../Utils/BundleMap';
@@ -55,6 +55,7 @@ interface ProvVisProps<T, S extends string, A> {
   ephemeralUndo?: boolean;
   cellsVisArea?: number;
   legend?: boolean;
+  filters?: boolean;
 }
 
 export type StratifiedMap<T, S, A> = {
@@ -95,7 +96,8 @@ function ProvVis<T, S extends string, A>({
   prov,
   ephemeralUndo = false,
   cellsVisArea = 50,
-  legend = false
+  legend = false,
+  filters = false
 }: ProvVisProps<T, S, A>) {
   const [first, setFirst] = useState(true);
   const [bookmark, setBookmark] = useState(false);
@@ -217,21 +219,155 @@ function ProvVis<T, S extends string, A>({
     setFirst(false);
   }, []);
 
+
+
+
+
+  debugger
+  // Apply user filters:
+  let typeFilters: Array<string> = new Array();
+  eventTypes.forEach(type => {
+    let id = type+" checkbox";
+    let checkbox = document.getElementById(id);
+    // @ts-ignore
+    if(checkbox && checkbox.checked){
+      typeFilters.push(type);
+    }
+  });
+
+
+
+  let removeList: Array<string> = [];
+  debugger
+  recursiveRemoveFiltered(nodeMap[root]);
+
+  function recursiveRemoveFiltered(node: ProvenanceNode<T, S, A>, parentNode?: ProvenanceNode<T, S, A>){
+    // node that needs to be removed:
+    if(isChildNode(node) && node.metadata && node.metadata.type && typeFilters.includes(node.metadata.type)){
+      // remove the node from the parents children and from the nodeList
+      if(node.parent && parentNode && parentNode.children){
+        // remove from parent if exists there
+        if(parentNode.children.includes(node.id)){
+          parentNode.children.splice(parentNode.children.indexOf(node.id),1);
+        }
+        // remove from nodeList... this is done with the filter methode when initialising nodeList later on, but here I set the condition
+        removeList.push(node.id);
+      }
+      node.children.forEach(n => {
+        let child = nodeMap[n];
+        if(isChildNode(node) && node.parent && parentNode && parentNode.children){
+          if(isChildNode(child)){ // for sure it is a child, but I check here because typescript does not know
+            child.parent = parentNode.id;
+          }
+          // parentNode.children.push(n)
+          recursiveRemoveFiltered(child,parentNode); // the parent stays the parent of this node, since this one is removed
+        }
+      });
+    }else{ // node that will not be removed
+      // if node was already child of parentNode: no problem, if not: add it
+      if(parentNode && !parentNode.children.includes(node.id)){
+        parentNode.children.push(node.id);
+      }
+      if(node.children){
+        node.children.forEach(n => {
+          let child = nodeMap[n];
+          // if(isChildNode(child) && parentNode){ // for sure it is a child, but I check here because typescript does not know
+          //   child.parent = parentNode.id;
+          // }
+          // parentNode.children.push(n)
+          recursiveRemoveFiltered(child,node); // the parent is THIS node, not the parent node of this node
+        });
+      }
+    }
+  }
+
+  // function recursiveRemoveFilteredd(node: ProvenanceNode<T, S, A>, parentNode?: ProvenanceNode<T, S, A>){
+  //   if(isChildNode(node) && node.metadata && node.metadata.type){
+  //     if(typeFilters.includes(node.metadata.type)){
+  //       // remove the node from the parents children and from the nodeList
+  //       if(node.parent && parentNode && parentNode.children){
+  //         // remove from parent
+  //         parentNode.children.splice(parentNode.children.indexOf(node.id),1);
+  //         // remove from nodeList... this is done with the filter methode when initialising nodeList later on, but here I set the condition
+  //         removeList.push(node.id);
+  //       }
+  //
+  //       // add the children of the removed node to the parent of the removed node IF they are not removed themselves
+  //       if(node.children){
+  //         node.children.forEach(n => {
+  //           let child = nodeMap[n];
+  //           if(isChildNode(node) && node.parent && parentNode && parentNode.children){
+  //             if(isChildNode(child)){ // for sure it is a child, but I check here because typescript does not know
+  //               child.parent = parentNode.id;
+  //             }
+  //             // parentNode.children.push(n)
+  //             recursiveRemoveFiltered(child,parentNode);
+  //           }
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
+
+  // // This has to be given more thought: If there are two actions in a row that will be filtered, then the first child adds the second child to the parents children, even though the second child will be removed as well.
+  // let removeList: Array<string> = [];
+  // // let prevNode: HierarchyNode<ProvenanceNode<T, S, A>>;
+  // for (let j in nodeMap) {
+  //   let node = nodeMap[j];
+  //   let parentNode: ProvenanceNode<T, S, A>;
+  //   if(isChildNode(node) && node.metadata && node.metadata.type){
+  //     parentNode = nodeMap[node.parent];
+  //     if(typeFilters.includes(node.metadata.type)){
+  //       // push the children of the node that will be removed to the parent
+  //       if(node.children){
+  //         node.children.forEach(n => {
+  //           let child = nodeMap[n];
+  //           if(isChildNode(node) && node.parent && parentNode.children){
+  //             if(isChildNode(child)){ // for sure it is a child, but I check here because typescript does not know
+  //               child.parent = parentNode.id;
+  //             }
+  //             parentNode.children.push(n)
+  //           }
+  //         });
+  //       }
+  //       // remove the node that has been selected by user filters
+  //       if(node.parent && parentNode.children){
+  //         // remove from parent
+  //         parentNode.children.splice(parentNode.children.indexOf(node.id),1);
+  //         // remove from nodeList... this is done with the filter methode when initialising nodeList later on, but here I set the condition
+  //         removeList.push(node.id);
+  //       }
+  //     }
+  //   }
+  // }
+
+
   let nodeList = Object.values(nodeMap).filter(
-    (d) => true
+    (d) => !removeList.includes(d.id)
   );
+
+  let filteredBundleMap: BundleMap = {};
+  for(let key in bundleMap){
+    if(!removeList.includes(key)){
+      filteredBundleMap[key] = bundleMap[key];
+    }
+  }
+  debugger
+
+
 
 
   let copyList = Array.from(nodeList);
 
-  const keys = bundleMap ? Object.keys(bundleMap) : [];
+  const keys = filteredBundleMap ? Object.keys(filteredBundleMap) : [];
 
   //Find a list of all nodes included in a bundle.
   let bundledNodes: string[] = [];
 
-  if (bundleMap) {
+
+  if (filteredBundleMap) {
     for (let key of keys) {
-      bundledNodes = bundledNodes.concat(bundleMap[key].bunchedNodes);
+      bundledNodes = bundledNodes.concat(filteredBundleMap[key].bunchedNodes);
       bundledNodes.push(key);
     }
   }
@@ -244,8 +380,8 @@ function ProvVis<T, S extends string, A>({
       if (isChildNode(d)) {
         //If you are a unexpanded bundle, find your parent by going straight up.
         if (
-          bundleMap &&
-          Object.keys(bundleMap).includes(d.id) &&
+          filteredBundleMap &&
+          Object.keys(filteredBundleMap).includes(d.id) &&
           !expandedClusterList.includes(d.id)
         ) {
           let curr = d;
@@ -253,7 +389,7 @@ function ProvVis<T, S extends string, A>({
           while (true) {
             //need this to remove linter warning.
             let localCurr = curr;
-            // let bundlePar = findBundleParent(curr.parent, bundleMap);
+            // let bundlePar = findBundleParent(curr.parent, filteredBundleMap);
             // if(bundlePar.length > 0)
             // {
             //   for(let j in bundlePar)
@@ -267,7 +403,7 @@ function ProvVis<T, S extends string, A>({
 
             if (
               !bundledNodes.includes(localCurr.parent) ||
-              Object.keys(bundleMap).includes(localCurr.parent)
+              Object.keys(filteredBundleMap).includes(localCurr.parent)
             ) {
               return localCurr.parent;
             }
@@ -282,7 +418,7 @@ function ProvVis<T, S extends string, A>({
           }
         }
 
-        let bundleParents = findBundleParent(d.parent, bundleMap);
+        let bundleParents = findBundleParent(d.parent, filteredBundleMap);
         let collapsedParent = undefined;
 
         let allExpanded = true;
@@ -297,8 +433,8 @@ function ProvVis<T, S extends string, A>({
 
         if (
           bundledNodes.includes(d.parent) &&
-          bundleMap &&
-          !Object.keys(bundleMap).includes(d.parent) &&
+          filteredBundleMap &&
+          !Object.keys(filteredBundleMap).includes(d.parent) &&
           !allExpanded
         ) {
           return collapsedParent;
@@ -311,7 +447,7 @@ function ProvVis<T, S extends string, A>({
     });
 
   for (let i = 0; i < nodeList.length; i++) {
-    let bundleParents = findBundleParent(nodeList[i].id, bundleMap);
+    let bundleParents = findBundleParent(nodeList[i].id, filteredBundleMap);
 
     let allExpanded = true;
 
@@ -325,8 +461,8 @@ function ProvVis<T, S extends string, A>({
     if (
       bundledNodes.includes(nodeList[i].id) &&
       !allExpanded &&
-      bundleMap &&
-      !Object.keys(bundleMap).includes(nodeList[i].id)
+      filteredBundleMap &&
+      !Object.keys(filteredBundleMap).includes(nodeList[i].id)
     ) {
       nodeList.splice(i, 1);
       i--;
@@ -337,6 +473,7 @@ function ProvVis<T, S extends string, A>({
 
   const stratifiedList: StratifiedList<T, S, A> = stratifiedTree.descendants();
   const stratifiedMap: StratifiedMap<T, S, A> = {};
+
 
   stratifiedList.forEach((c) => (stratifiedMap[c.id!] = c));
   treeLayout(stratifiedMap, current, root);
@@ -453,6 +590,7 @@ function ProvVis<T, S extends string, A>({
     <div>
       {legend &&
         <Legend
+          filters={filters}
           eventConfig={eventConfig}
           iconHeight={25}
           iconWidth={25}
@@ -515,7 +653,7 @@ function ProvVis<T, S extends string, A>({
                 stratifiedMap,
                 annotationOpen,
                 annotationHeight,
-                bundleMap
+                filteredBundleMap
               )}
             >
               {(linkArr) => (
@@ -551,7 +689,7 @@ function ProvVis<T, S extends string, A>({
                 stratifiedMap,
                 annotationOpen,
                 annotationHeight,
-                bundleMap
+                filteredBundleMap
               )}
             >
               {(nodes) => {
@@ -586,7 +724,7 @@ function ProvVis<T, S extends string, A>({
                               node={d.data}
                               setBookmark={setBookmark}
                               bookmark={bookmark}
-                              bundleMap={bundleMap}
+                              bundleMap={filteredBundleMap}
                               nodeMap={stratifiedMap}
                               clusterLabels={clusterLabels}
                               annotationOpen={annotationOpen}
@@ -649,7 +787,7 @@ function ProvVis<T, S extends string, A>({
                 stratifiedList,
                 annotationOpen,
                 annotationHeight,
-                bundleMap
+                filteredBundleMap
               )}
             >
               {(bundle) => (
@@ -657,7 +795,8 @@ function ProvVis<T, S extends string, A>({
                   {bundle.map((b) => {
                     const { key, state } = b;
                     if (
-                      bundleMap === undefined ||
+                      filteredBundleMap === undefined ||
+                      stratifiedMap[b.key] === undefined ||
                       (stratifiedMap[b.key] as any).width !== 0 ||
                       state.validity === false
                     ) {
