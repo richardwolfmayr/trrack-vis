@@ -156,9 +156,6 @@ function ProvVis<T, S extends string, A>({
       symbol().type(symbolWye)
     ]
 
-
-
-
     // Find nodes in the clusters whose entire cluster is on the backbone.
     let conf: EventConfig<E> = {}
     let counter = 0;
@@ -220,10 +217,6 @@ function ProvVis<T, S extends string, A>({
   }, []);
 
 
-
-
-
-  debugger
   // Apply user filters:
   let typeFilters: Array<string> = new Array();
   eventTypes.forEach(type => {
@@ -238,9 +231,9 @@ function ProvVis<T, S extends string, A>({
 
 
   let removeList: Array<string> = [];
-  debugger
   recursiveRemoveFiltered(nodeMap[root]);
 
+  // Go through the whole tree and remove nodes that have been filtered out by user settings.
   function recursiveRemoveFiltered(node: ProvenanceNode<T, S, A>, parentNode?: ProvenanceNode<T, S, A>){
     // node that needs to be removed:
     if(isChildNode(node) && node.metadata && node.metadata.type && typeFilters.includes(node.metadata.type)){
@@ -271,76 +264,11 @@ function ProvVis<T, S extends string, A>({
       if(node.children){
         node.children.forEach(n => {
           let child = nodeMap[n];
-          // if(isChildNode(child) && parentNode){ // for sure it is a child, but I check here because typescript does not know
-          //   child.parent = parentNode.id;
-          // }
-          // parentNode.children.push(n)
           recursiveRemoveFiltered(child,node); // the parent is THIS node, not the parent node of this node
         });
       }
     }
   }
-
-  // function recursiveRemoveFilteredd(node: ProvenanceNode<T, S, A>, parentNode?: ProvenanceNode<T, S, A>){
-  //   if(isChildNode(node) && node.metadata && node.metadata.type){
-  //     if(typeFilters.includes(node.metadata.type)){
-  //       // remove the node from the parents children and from the nodeList
-  //       if(node.parent && parentNode && parentNode.children){
-  //         // remove from parent
-  //         parentNode.children.splice(parentNode.children.indexOf(node.id),1);
-  //         // remove from nodeList... this is done with the filter methode when initialising nodeList later on, but here I set the condition
-  //         removeList.push(node.id);
-  //       }
-  //
-  //       // add the children of the removed node to the parent of the removed node IF they are not removed themselves
-  //       if(node.children){
-  //         node.children.forEach(n => {
-  //           let child = nodeMap[n];
-  //           if(isChildNode(node) && node.parent && parentNode && parentNode.children){
-  //             if(isChildNode(child)){ // for sure it is a child, but I check here because typescript does not know
-  //               child.parent = parentNode.id;
-  //             }
-  //             // parentNode.children.push(n)
-  //             recursiveRemoveFiltered(child,parentNode);
-  //           }
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-
-  // // This has to be given more thought: If there are two actions in a row that will be filtered, then the first child adds the second child to the parents children, even though the second child will be removed as well.
-  // let removeList: Array<string> = [];
-  // // let prevNode: HierarchyNode<ProvenanceNode<T, S, A>>;
-  // for (let j in nodeMap) {
-  //   let node = nodeMap[j];
-  //   let parentNode: ProvenanceNode<T, S, A>;
-  //   if(isChildNode(node) && node.metadata && node.metadata.type){
-  //     parentNode = nodeMap[node.parent];
-  //     if(typeFilters.includes(node.metadata.type)){
-  //       // push the children of the node that will be removed to the parent
-  //       if(node.children){
-  //         node.children.forEach(n => {
-  //           let child = nodeMap[n];
-  //           if(isChildNode(node) && node.parent && parentNode.children){
-  //             if(isChildNode(child)){ // for sure it is a child, but I check here because typescript does not know
-  //               child.parent = parentNode.id;
-  //             }
-  //             parentNode.children.push(n)
-  //           }
-  //         });
-  //       }
-  //       // remove the node that has been selected by user filters
-  //       if(node.parent && parentNode.children){
-  //         // remove from parent
-  //         parentNode.children.splice(parentNode.children.indexOf(node.id),1);
-  //         // remove from nodeList... this is done with the filter methode when initialising nodeList later on, but here I set the condition
-  //         removeList.push(node.id);
-  //       }
-  //     }
-  //   }
-  // }
-
 
   let nodeList = Object.values(nodeMap).filter(
     (d) => !removeList.includes(d.id)
@@ -352,10 +280,6 @@ function ProvVis<T, S extends string, A>({
       filteredBundleMap[key] = bundleMap[key];
     }
   }
-  debugger
-
-
-
 
   let copyList = Array.from(nodeList);
 
@@ -363,7 +287,6 @@ function ProvVis<T, S extends string, A>({
 
   //Find a list of all nodes included in a bundle.
   let bundledNodes: string[] = [];
-
 
   if (filteredBundleMap) {
     for (let key of keys) {

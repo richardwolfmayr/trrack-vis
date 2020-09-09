@@ -65,10 +65,6 @@ export function Legend({
       eventTypeDescriptions.push(eventDiv);
     }
   }
-
-
-
-
   return <div id="Legend" className={legendBorderDivStyle}>
     {eventTypeDescriptions}
   </div>

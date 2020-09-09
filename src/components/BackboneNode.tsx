@@ -437,24 +437,24 @@ function BackboneNode<T, S extends string, A>({
         case "code": {
           return style({
             // @ts-ignore
-            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(88, 22, 22)' : 'white',
-            stroke: 'rgb(88, 22, 22)'
+            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(150, 22, 22)' : 'white',
+            stroke: 'rgb(150, 22, 22)'
           });
           break;
         }
         case "markdown": {
           return style({
             // @ts-ignore
-            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 88, 22)' : 'white',
-            stroke: 'rgb(22, 88, 22)'
+            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 150, 22)' : 'white',
+            stroke: 'rgb(22, 150, 22)'
           });
           break;
         }
         case "raw": {
           return style({
             // @ts-ignore
-            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 22, 88)' : 'white',
-            stroke: 'rgb(22, 22, 88)'
+            fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 22, 150)' : 'white',
+            stroke: 'rgb(22, 22, 150)'
           });
           break;
         }
