@@ -44,7 +44,7 @@ export function Legend({
   if(eventConfig){
     for (let key in eventConfig) {
       let event = eventConfig[key];
-      let eventDiv = <div className={eventDivStyle}>
+      let eventDiv = <div className={eventDivStyle} key={key}>
         <svg height={iconHeight} width={iconWidth} className={eventIconStyle} >
           <g transform={transform}>
             {event.backboneGlyph}
