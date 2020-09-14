@@ -4,7 +4,6 @@ export declare type Config = {
     currentGlyph: ReactChild;
     backboneGlyph: ReactChild;
     bundleGlyph: ReactChild;
-    description: string;
 };
 export declare type EventConfig<E extends string> = {
     [key: string]: Partial<Config>;

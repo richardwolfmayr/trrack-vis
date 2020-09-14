@@ -35,12 +35,10 @@ interface ProvVisProps<T, S extends string, A> {
     prov?: Provenance<T, S, A>;
     ephemeralUndo?: boolean;
     cellsVisArea?: number;
-    legend?: boolean;
-    filters?: boolean;
 }
 export declare type StratifiedMap<T, S, A> = {
     [key: string]: HierarchyNode<ProvenanceNode<T, S, A>>;
 };
 export declare type StratifiedList<T, S, A> = HierarchyNode<ProvenanceNode<T, S, A>>[];
-declare function ProvVis<T, S extends string, A>({ nodeMap, root, current, changeCurrent, width, height, iconOnly, gutter, backboneGutter, verticalSpace, annotationHeight, clusterVerticalSpace, regularCircleRadius, backboneCircleRadius, regularCircleStroke, backboneCircleStroke, sideOffset, topOffset, textSize, linkWidth, duration, clusterLabels, bundleMap, eventConfig, popupContent, annotationContent, editAnnotations, undoRedoButtons, prov, ephemeralUndo, cellsVisArea, legend, filters }: ProvVisProps<T, S, A>): JSX.Element;
+declare function ProvVis<T, S extends string, A>({ nodeMap, root, current, changeCurrent, width, height, iconOnly, gutter, backboneGutter, verticalSpace, annotationHeight, clusterVerticalSpace, regularCircleRadius, backboneCircleRadius, regularCircleStroke, backboneCircleStroke, sideOffset, topOffset, textSize, linkWidth, duration, clusterLabels, bundleMap, eventConfig, popupContent, annotationContent, editAnnotations, undoRedoButtons, prov, ephemeralUndo, cellsVisArea }: ProvVisProps<T, S, A>): JSX.Element;
 export default ProvVis;
