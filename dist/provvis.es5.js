@@ -54330,8 +54330,8 @@ function search(nodes, node, final, path) {
 
 var treeColor = function (current) {
     return style({
-        fill: current ? 'rgb(88, 22, 22)' : 'white',
-        stroke: 'rgb(88, 22, 22)'
+        fill: current ? 'rgb(33, 133, 208)' : 'white',
+        stroke: 'rgb(33, 133, 208)'
     });
 };
 
@@ -54503,22 +54503,22 @@ function BackboneNode(_a) {
             case "code": {
                 return style({
                     // @ts-ignore
-                    fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(88, 22, 22)' : 'white',
-                    stroke: 'rgb(88, 22, 22)'
+                    fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(150, 22, 22)' : 'white',
+                    stroke: 'rgb(150, 22, 22)'
                 });
             }
             case "markdown": {
                 return style({
                     // @ts-ignore
-                    fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 88, 22)' : 'white',
-                    stroke: 'rgb(22, 88, 22)'
+                    fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 150, 22)' : 'white',
+                    stroke: 'rgb(22, 150, 22)'
                 });
             }
             case "raw": {
                 return style({
                     // @ts-ignore
-                    fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 22, 88)' : 'white',
-                    stroke: 'rgb(22, 22, 88)'
+                    fill: prov.getExtraFromArtifact(node.id)[0].e.changedCellId == index ? 'rgb(22, 22, 150)' : 'white',
+                    stroke: 'rgb(22, 22, 150)'
                 });
             }
         }
@@ -54799,12 +54799,55 @@ function nodeTransitions(xOffset, yOffset, clusterOffset, backboneOffset, durati
     return { enter: enter, leave: start, update: update, start: start };
 }
 
+var legendBorderDivStyle = style({
+    borderRadius: "4px",
+    border: "4px solid",
+    display: "inline-block",
+    color: "#ffffff",
+    fontFamily: "Lato,Helvetica Neue,Arial,Helvetica,sans-serif",
+    fontSize: "14px",
+    padding: "5px 5px",
+    margin: "10px 10px 10px 0px"
+});
+var eventIconStyle = style({
+    verticalAlign: "middle"
+});
+var eventDescriptionStyle = style({
+    display: "inline",
+    color: "black"
+});
+var eventDivStyle = style({
+    marginTop: "5px",
+    marginBottom: "5px"
+});
+function redraw() {
+    console.log("redraw");
+}
+function Legend(_a) {
+    var filters = _a.filters, eventConfig = _a.eventConfig, iconHeight = _a.iconHeight, iconWidth = _a.iconWidth;
+    var eventTypeDescriptions = new Array();
+    var transform = "translate(" + iconHeight / 2 + ", " + (iconWidth / 2 - 2.5) + ")";
+    if (eventConfig) {
+        for (var key in eventConfig) {
+            var event_1 = eventConfig[key];
+            var eventDiv = React__default.createElement("div", { className: eventDivStyle, key: key },
+                filters &&
+                    React__default.createElement("input", { type: "checkbox", id: key + " checkbox", name: key, value: key, onClick: redraw }),
+                React__default.createElement("svg", { height: iconHeight, width: iconWidth, className: eventIconStyle },
+                    React__default.createElement("g", { transform: transform }, event_1.backboneGlyph)),
+                React__default.createElement("p", { className: eventDescriptionStyle }, event_1.description ? event_1.description : "Event description missing"));
+            eventTypeDescriptions.push(eventDiv);
+        }
+    }
+    return React__default.createElement("div", { id: "Legend", className: legendBorderDivStyle }, eventTypeDescriptions);
+}
+
 function ProvVis(_a) {
     var e_1, _b;
-    var nodeMap = _a.nodeMap, root = _a.root, current = _a.current, changeCurrent = _a.changeCurrent, _c = _a.width, width = _c === void 0 ? 1500 : _c, _d = _a.height, height = _d === void 0 ? 2000 : _d, _e = _a.iconOnly, iconOnly = _e === void 0 ? false : _e, _f = _a.gutter, gutter = _f === void 0 ? 15 : _f, _g = _a.backboneGutter, backboneGutter = _g === void 0 ? 20 : _g, _h = _a.verticalSpace, verticalSpace = _h === void 0 ? 50 : _h, _j = _a.annotationHeight, annotationHeight = _j === void 0 ? 100 : _j, _k = _a.clusterVerticalSpace, clusterVerticalSpace = _k === void 0 ? 50 : _k, _l = _a.regularCircleRadius, regularCircleRadius = _l === void 0 ? 4 : _l, _m = _a.backboneCircleRadius, backboneCircleRadius = _m === void 0 ? 5 : _m, _o = _a.regularCircleStroke, regularCircleStroke = _o === void 0 ? 3 : _o, _p = _a.backboneCircleStroke, backboneCircleStroke = _p === void 0 ? 3 : _p, _q = _a.sideOffset, sideOffset = _q === void 0 ? 200 : _q, _r = _a.topOffset, topOffset = _r === void 0 ? 30 : _r, _s = _a.textSize, textSize = _s === void 0 ? 15 : _s, _t = _a.linkWidth, linkWidth = _t === void 0 ? 4 : _t, _u = _a.duration, duration = _u === void 0 ? 600 : _u, _v = _a.clusterLabels, clusterLabels = _v === void 0 ? true : _v, _w = _a.bundleMap, bundleMap = _w === void 0 ? {} : _w, eventConfig = _a.eventConfig, popupContent = _a.popupContent, annotationContent = _a.annotationContent, _x = _a.editAnnotations, editAnnotations = _x === void 0 ? false : _x, _y = _a.undoRedoButtons, prov = _a.prov, _z = _a.ephemeralUndo, ephemeralUndo = _z === void 0 ? false : _z, _0 = _a.cellsVisArea, cellsVisArea = _0 === void 0 ? 50 : _0;
-    var _1 = __read(useState(true), 2), first = _1[0], setFirst = _1[1];
-    var _2 = __read(useState(false), 2), bookmark = _2[0], setBookmark = _2[1];
-    var _3 = __read(useState(-1), 2), annotationOpen = _3[0], setAnnotationOpen = _3[1];
+    var nodeMap = _a.nodeMap, root = _a.root, current = _a.current, changeCurrent = _a.changeCurrent, _c = _a.width, width = _c === void 0 ? 1500 : _c, _d = _a.height, height = _d === void 0 ? 2000 : _d, _e = _a.iconOnly, iconOnly = _e === void 0 ? false : _e, _f = _a.gutter, gutter = _f === void 0 ? 15 : _f, _g = _a.backboneGutter, backboneGutter = _g === void 0 ? 20 : _g, _h = _a.verticalSpace, verticalSpace = _h === void 0 ? 50 : _h, _j = _a.annotationHeight, annotationHeight = _j === void 0 ? 100 : _j, _k = _a.clusterVerticalSpace, clusterVerticalSpace = _k === void 0 ? 50 : _k, _l = _a.regularCircleRadius, regularCircleRadius = _l === void 0 ? 4 : _l, _m = _a.backboneCircleRadius, backboneCircleRadius = _m === void 0 ? 5 : _m, _o = _a.regularCircleStroke, regularCircleStroke = _o === void 0 ? 3 : _o, _p = _a.backboneCircleStroke, backboneCircleStroke = _p === void 0 ? 3 : _p, _q = _a.sideOffset, sideOffset = _q === void 0 ? 200 : _q, _r = _a.topOffset, topOffset = _r === void 0 ? 30 : _r, _s = _a.textSize, textSize = _s === void 0 ? 15 : _s, _t = _a.linkWidth, linkWidth = _t === void 0 ? 4 : _t, _u = _a.duration, duration = _u === void 0 ? 600 : _u, _v = _a.clusterLabels, clusterLabels = _v === void 0 ? true : _v, _w = _a.bundleMap, bundleMap = _w === void 0 ? {} : _w, eventConfig = _a.eventConfig, popupContent = _a.popupContent, annotationContent = _a.annotationContent, _x = _a.editAnnotations, editAnnotations = _x === void 0 ? false : _x, _y = _a.undoRedoButtons, prov = _a.prov, _z = _a.ephemeralUndo, ephemeralUndo = _z === void 0 ? false : _z, _0 = _a.cellsVisArea, cellsVisArea = _0 === void 0 ? 50 : _0, _1 = _a.legend, legend = _1 === void 0 ? false : _1, _2 = _a.filters, filters = _2 === void 0 ? false : _2;
+    var _3 = __read(useState(true), 2), first = _3[0], setFirst = _3[1];
+    var _4 = __read(useState(false), 2), bookmark = _4[0], setBookmark = _4[1];
+    var _5 = __read(useState(-1), 2), annotationOpen = _5[0], setAnnotationOpen = _5[1];
     var list = [];
     var eventTypes = new Set();
     for (var j in nodeMap) {
@@ -54870,23 +54913,78 @@ function ProvVis(_a) {
         }
         return conf;
     }
-    var _4 = __read(useState(Object.keys(bundleMap)), 2), expandedClusterList = _4[0], setExpandedClusterList = _4[1];
+    var _6 = __read(useState(Object.keys(bundleMap)), 2), expandedClusterList = _6[0], setExpandedClusterList = _6[1];
     if (!eventConfig && eventTypes.size > 0 && eventTypes.size < 8) {
         eventConfig = setDefaultConfig(eventTypes);
     }
     useEffect(function () {
         setFirst(false);
     }, []);
-    var nodeList = Object.values(nodeMap).filter(function (d) { return true; });
+    // Apply user filters:
+    var typeFilters = new Array();
+    eventTypes.forEach(function (type) {
+        var id = type + " checkbox";
+        var checkbox = document.getElementById(id);
+        // @ts-ignore
+        if (checkbox && checkbox.checked) {
+            typeFilters.push(type);
+        }
+    });
+    var removeList = [];
+    recursiveRemoveFiltered(nodeMap[root]);
+    // Go through the whole tree and remove nodes that have been filtered out by user settings.
+    function recursiveRemoveFiltered(node, parentNode) {
+        // node that needs to be removed:
+        if (isChildNode(node) && node.metadata && node.metadata.type && typeFilters.includes(node.metadata.type)) {
+            // remove the node from the parents children and from the nodeList
+            if (node.parent && parentNode && parentNode.children) {
+                // remove from parent if exists there
+                if (parentNode.children.includes(node.id)) {
+                    parentNode.children.splice(parentNode.children.indexOf(node.id), 1);
+                }
+                // remove from nodeList... this is done with the filter methode when initialising nodeList later on, but here I set the condition
+                removeList.push(node.id);
+            }
+            node.children.forEach(function (n) {
+                var child = nodeMap[n];
+                if (isChildNode(node) && node.parent && parentNode && parentNode.children) {
+                    if (isChildNode(child)) { // for sure it is a child, but I check here because typescript does not know
+                        child.parent = parentNode.id;
+                    }
+                    // parentNode.children.push(n)
+                    recursiveRemoveFiltered(child, parentNode); // the parent stays the parent of this node, since this one is removed
+                }
+            });
+        }
+        else { // node that will not be removed
+            // if node was already child of parentNode: no problem, if not: add it
+            if (parentNode && !parentNode.children.includes(node.id)) {
+                parentNode.children.push(node.id);
+            }
+            if (node.children) {
+                node.children.forEach(function (n) {
+                    var child = nodeMap[n];
+                    recursiveRemoveFiltered(child, node); // the parent is THIS node, not the parent node of this node
+                });
+            }
+        }
+    }
+    var nodeList = Object.values(nodeMap).filter(function (d) { return !removeList.includes(d.id); });
+    var filteredBundleMap = {};
+    for (var key in bundleMap) {
+        if (!removeList.includes(key)) {
+            filteredBundleMap[key] = bundleMap[key];
+        }
+    }
     var copyList = Array.from(nodeList);
-    var keys = bundleMap ? Object.keys(bundleMap) : [];
+    var keys = filteredBundleMap ? Object.keys(filteredBundleMap) : [];
     //Find a list of all nodes included in a bundle.
     var bundledNodes = [];
-    if (bundleMap) {
+    if (filteredBundleMap) {
         try {
             for (var keys_1 = __values(keys), keys_1_1 = keys_1.next(); !keys_1_1.done; keys_1_1 = keys_1.next()) {
                 var key = keys_1_1.value;
-                bundledNodes = bundledNodes.concat(bundleMap[key].bunchedNodes);
+                bundledNodes = bundledNodes.concat(filteredBundleMap[key].bunchedNodes);
                 bundledNodes.push(key);
             }
         }
@@ -54905,14 +55003,14 @@ function ProvVis(_a) {
             return null;
         if (isChildNode(d)) {
             //If you are a unexpanded bundle, find your parent by going straight up.
-            if (bundleMap &&
-                Object.keys(bundleMap).includes(d.id) &&
+            if (filteredBundleMap &&
+                Object.keys(filteredBundleMap).includes(d.id) &&
                 !expandedClusterList.includes(d.id)) {
                 var curr = d;
                 var _loop_1 = function () {
                     //need this to remove linter warning.
                     var localCurr = curr;
-                    // let bundlePar = findBundleParent(curr.parent, bundleMap);
+                    // let bundlePar = findBundleParent(curr.parent, filteredBundleMap);
                     // if(bundlePar.length > 0)
                     // {
                     //   for(let j in bundlePar)
@@ -54924,7 +55022,7 @@ function ProvVis(_a) {
                     //   }
                     // }
                     if (!bundledNodes.includes(localCurr.parent) ||
-                        Object.keys(bundleMap).includes(localCurr.parent)) {
+                        Object.keys(filteredBundleMap).includes(localCurr.parent)) {
                         return { value: localCurr.parent };
                     }
                     var temp = copyList.filter(function (d) {
@@ -54940,7 +55038,7 @@ function ProvVis(_a) {
                         return state_1.value;
                 }
             }
-            var bundleParents = findBundleParent(d.parent, bundleMap);
+            var bundleParents = findBundleParent(d.parent, filteredBundleMap);
             var collapsedParent = undefined;
             var allExpanded = true;
             for (var j in bundleParents) {
@@ -54951,8 +55049,8 @@ function ProvVis(_a) {
                 }
             }
             if (bundledNodes.includes(d.parent) &&
-                bundleMap &&
-                !Object.keys(bundleMap).includes(d.parent) &&
+                filteredBundleMap &&
+                !Object.keys(filteredBundleMap).includes(d.parent) &&
                 !allExpanded) {
                 return collapsedParent;
             }
@@ -54963,7 +55061,7 @@ function ProvVis(_a) {
         }
     });
     for (var i = 0; i < nodeList.length; i++) {
-        var bundleParents = findBundleParent(nodeList[i].id, bundleMap);
+        var bundleParents = findBundleParent(nodeList[i].id, filteredBundleMap);
         var allExpanded = true;
         for (var j in bundleParents) {
             if (!expandedClusterList.includes(bundleParents[j])) {
@@ -54973,8 +55071,8 @@ function ProvVis(_a) {
         }
         if (bundledNodes.includes(nodeList[i].id) &&
             !allExpanded &&
-            bundleMap &&
-            !Object.keys(bundleMap).includes(nodeList[i].id)) {
+            filteredBundleMap &&
+            !Object.keys(filteredBundleMap).includes(nodeList[i].id)) {
             nodeList.splice(i, 1);
             i--;
         }
@@ -55061,6 +55159,8 @@ function ProvVis(_a) {
     // let bundleRectPadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) * maxNumberOfCells; // the rectangular for the bundled nodes needs to be bigger because of the cells
     var cellsBundlePadding = (cellsVisArea ? Math.sqrt(cellsVisArea) : Math.sqrt(15)) + 6;
     return (React__default.createElement("div", null,
+        legend &&
+            React__default.createElement(Legend, { filters: filters, eventConfig: eventConfig, iconHeight: 25, iconWidth: 25 }),
         React__default.createElement("div", { id: "undoRedoDiv", style: undoRedoStickyStyle },
             React__default.createElement(UndoRedoButton, { graph: prov ? prov.graph() : undefined, undoCallback: function () {
                     if (prov) {
@@ -55097,7 +55197,7 @@ function ProvVis(_a) {
                         return (React__default.createElement("g", { key: key },
                             React__default.createElement(Link, __assign({}, state, { fill: '#ccc', stroke: '#ccc', strokeWidth: linkWidth }))));
                     }))); }),
-                    React__default.createElement(NodeGroup, __assign({ data: stratifiedList, keyAccessor: function (d) { return d.id; } }, nodeTransitions(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, bundleMap)), function (nodes) {
+                    React__default.createElement(NodeGroup, __assign({ data: stratifiedList, keyAccessor: function (d) { return d.id; } }, nodeTransitions(xOffset, yOffset, clusterVerticalSpace, backboneGutter - gutter, duration, stratifiedList, stratifiedMap, annotationOpen, annotationHeight, filteredBundleMap)), function (nodes) {
                         return (React__default.createElement(React__default.Fragment, null, nodes.map(function (node) {
                             var d = node.data, key = node.key, state = node.state;
                             var popupTrigger = (React__default.createElement("g", { key: key, onClick: function () {
@@ -55106,7 +55206,7 @@ function ProvVis(_a) {
                                     }
                                 }, transform: d.width === 0
                                     ? translate(state.x, state.y)
-                                    : translate(state.x, state.y) }, d.width === 0 ? (React__default.createElement(BackboneNode, { prov: prov, textSize: textSize, iconOnly: iconOnly, radius: backboneCircleRadius, strokeWidth: backboneCircleStroke, duration: duration, first: first, current: current === d.id, node: d.data, setBookmark: setBookmark, bookmark: bookmark, bundleMap: bundleMap, nodeMap: stratifiedMap, clusterLabels: clusterLabels, annotationOpen: annotationOpen, setAnnotationOpen: setAnnotationOpen, exemptList: expandedClusterList, editAnnotations: editAnnotations, setExemptList: setExpandedClusterList, eventConfig: eventConfig, annotationContent: annotationContent, popupContent: popupContent, expandedClusterList: expandedClusterList, cellsVisArea: cellsVisArea, yOffset: yOffset })) : popupContent !== undefined ? (React__default.createElement(Popup, { content: popupContent(d.data), trigger: React__default.createElement("g", { onClick: function () {
+                                    : translate(state.x, state.y) }, d.width === 0 ? (React__default.createElement(BackboneNode, { prov: prov, textSize: textSize, iconOnly: iconOnly, radius: backboneCircleRadius, strokeWidth: backboneCircleStroke, duration: duration, first: first, current: current === d.id, node: d.data, setBookmark: setBookmark, bookmark: bookmark, bundleMap: filteredBundleMap, nodeMap: stratifiedMap, clusterLabels: clusterLabels, annotationOpen: annotationOpen, setAnnotationOpen: setAnnotationOpen, exemptList: expandedClusterList, editAnnotations: editAnnotations, setExemptList: setExpandedClusterList, eventConfig: eventConfig, annotationContent: annotationContent, popupContent: popupContent, expandedClusterList: expandedClusterList, cellsVisArea: cellsVisArea, yOffset: yOffset })) : popupContent !== undefined ? (React__default.createElement(Popup, { content: popupContent(d.data), trigger: React__default.createElement("g", { onClick: function () {
                                         setAnnotationOpen(-1);
                                     } }, keys.includes(d.id)
                                     ? bundleGlyph(d.data)
@@ -55116,9 +55216,10 @@ function ProvVis(_a) {
                             return popupTrigger;
                         })));
                     }),
-                    React__default.createElement(NodeGroup, __assign({ data: keys, keyAccessor: function (key) { return "" + key; } }, bundleTransitions(xOffset, verticalSpace, clusterVerticalSpace, backboneGutter - gutter, duration, expandedClusterList, stratifiedMap, stratifiedList, annotationOpen, annotationHeight, bundleMap)), function (bundle) { return (React__default.createElement(React__default.Fragment, null, bundle.map(function (b) {
+                    React__default.createElement(NodeGroup, __assign({ data: keys, keyAccessor: function (key) { return "" + key; } }, bundleTransitions(xOffset, verticalSpace, clusterVerticalSpace, backboneGutter - gutter, duration, expandedClusterList, stratifiedMap, stratifiedList, annotationOpen, annotationHeight, filteredBundleMap)), function (bundle) { return (React__default.createElement(React__default.Fragment, null, bundle.map(function (b) {
                         var key = b.key, state = b.state;
-                        if (bundleMap === undefined ||
+                        if (filteredBundleMap === undefined ||
+                            stratifiedMap[b.key] === undefined ||
                             stratifiedMap[b.key].width !== 0 ||
                             state.validity === false) {
                             return null;
