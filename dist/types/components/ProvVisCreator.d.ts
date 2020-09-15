@@ -22,6 +22,8 @@ export interface ProvVisConfig {
     linkWidth?: number;
     duration?: number;
     cellsVisArea?: number;
+    legend?: boolean;
+    filters?: boolean;
 }
 export declare function ProvVisCreator<T, S extends string, A>(node: Element, prov: Provenance<T, S, A>, callback?: (id: NodeID) => void, buttons?: boolean, ephemeralUndo?: boolean, fauxRoot?: NodeID, config?: Partial<ProvVisConfig>): void;
 export declare function UndoRedoButtonCreator<T, S extends string, A>(node: Element, graph: ProvenanceGraph<T, S, A>, undoCallback: () => void, redoCallback: () => void): void;

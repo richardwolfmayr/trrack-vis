@@ -4,8 +4,8 @@ exports.treeColor = void 0;
 var typestyle_1 = require("typestyle");
 exports.treeColor = function (current) {
     return typestyle_1.style({
-        fill: current ? 'rgb(88, 22, 22)' : 'white',
-        stroke: 'rgb(88, 22, 22)'
+        fill: current ? 'rgb(33, 133, 208)' : 'white',
+        stroke: 'rgb(33, 133, 208)'
     });
 };
 //# sourceMappingURL=Styles.js.map
